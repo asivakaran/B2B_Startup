@@ -1,34 +1,3 @@
-"""
-FastAPI app with two AI-powered routes using Groq:
-
-    GET /motivate?name=Ash
-        Returns a 1-sentence motivational quote personalized for `name`.
-
-    GET /get-plan?goal=run+a+marathon
-        Returns a 3-point fitness plan for the given `goal`.
-
-    GET /
-        HTML front-end (calls /get-plan).
-
-Setup:
-    pip install fastapi uvicorn requests python-dotenv
-
-Set your Groq API key (get one free at https://console.groq.com/keys):
-    export GROQ_API_KEY="your_key_here"        # macOS/Linux
-    setx GROQ_API_KEY "your_key_here"          # Windows (restart terminal after)
-
-    OR create a .env file next to this script with:
-        GROQ_API_KEY=your_key_here
-
-Run the server (module name must match this filename — it's server.py, so):
-    uvicorn server:app --reload --port 8000
-
-Test it:
-    http://127.0.0.1:8000/motivate?name=Ash
-    http://127.0.0.1:8000/get-plan?goal=run+a+marathon
-    http://127.0.0.1:8000/
-"""
-
 import os
 import requests
 from dotenv import load_dotenv
