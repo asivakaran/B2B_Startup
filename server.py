@@ -379,18 +379,29 @@ async def root():
             const resultBody = document.getElementById('result-body');
             resultBody.innerHTML = '';
             
-            // Strip out any Markdown stars (*) just in case the AI disobeys
-            let cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '');
+            // Simple string replacement to remove Markdown stars
+            let cleanText = text.split('**').join('').split('*').join('');
             
             cleanText.split('\n').forEach(function (line) {
                 const trimmed = line.trim();
                 if (!trimmed) return;
-                // Check if it's a number (1., 2., 3.) or ALL CAPS header
-                const isHeader = /^\d+\.\s/.test(trimmed) || /^[A-Z0-9 ]+:$/.test(trimmed) || /^[A-Z ]{5,}$/.test(trimmed);
+                
+                // Check if it's a number (1., 2., 3.) or says "SECTION"
+                const isHeader = (trimmed.indexOf("1.") === 0 || 
+                                  trimmed.indexOf("2.") === 0 || 
+                                  trimmed.indexOf("3.") === 0 || 
+                                  trimmed.indexOf("4.") === 0 || 
+                                  trimmed.indexOf("5.") === 0 || 
+                                  trimmed.indexOf("SECTION") === 0);
+                
                 const el = document.createElement(isHeader ? 'h3' : 'p');
                 el.textContent = trimmed;
                 resultBody.appendChild(el);
             });
+            
+            document.getElementById('doc-ref').textContent = 'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('doc-date').textContent = 'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+        }
             document.getElementById('doc-ref').textContent =
                 'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('doc-date').textContent =
