@@ -407,12 +407,6 @@ async def root():
             document.getElementById('doc-date').textContent =
                 'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
         }        
-            document.getElementById('doc-ref').textContent =
-                'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('doc-date').textContent =
-                'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-        }
-
         async function draftBrief(notes, email) {
             const resultWrap = document.getElementById('result-wrap');
             const btn = document.getElementById('draft-btn');
