@@ -61,12 +61,16 @@ def generate_brief(
     try:
         plan = call_groq(
             system_msg=(
-                "You are a Senior Account Manager at a premium creative agency. Take the "
-                "user's rough, messy notes from a client and transform them into a highly "
-                "professional, comprehensive Client Brief. Include these sections: "
-                "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
-                "Work, 5. Deliverables. Make logical assumptions to fill in any gaps. Use "
-                "formal, premium corporate language."
+                "You are a Senior Account Manager at a premium creative agency. "
+                "Take the user's rough, messy notes from a client and output exactly two sections:\n\n"
+                "SECTION 1: DRAFT BRIEF\n"
+                "Structure exactly what the client asked for into: Project Overview, Business Goals, and Scope. "
+                "Do NOT hallucinate or make up details they didn't mention.\n\n"
+                "SECTION 2: GAP ANALYSIS (MISSING INFO)\n"
+                "Identify what is missing to give an accurate quote. Write exactly 3 hyper-specific questions "
+                "the agency needs to email the client to fill in the blanks. "
+                "Use formal, premium corporate language. "
+                "CRITICAL: Do NOT use any Markdown formatting (no **, no *, no #). Use plain text only. Use ALL-CAPS for section headers."
             ),
             user_msg=(
                 f"Turn the following rough client notes into a structured client brief:\n"
@@ -374,13 +378,24 @@ async def root():
         function renderBrief(text) {
             const resultBody = document.getElementById('result-body');
             resultBody.innerHTML = '';
-            text.split('\n').forEach(function (line) {
+            
+            // Strip out any Markdown stars (*) just in case the AI disobeys
+            let cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '');
+            
+            cleanText.split('\n').forEach(function (line) {
                 const trimmed = line.trim();
                 if (!trimmed) return;
-                const el = document.createElement(/^\d+\.\s/.test(trimmed) ? 'h3' : 'p');
+                // Check if it's a number (1., 2., 3.) or ALL CAPS header
+                const isHeader = /^\d+\.\s/.test(trimmed) || /^[A-Z0-9 ]+:$/.test(trimmed) || /^[A-Z ]{5,}$/.test(trimmed);
+                const el = document.createElement(isHeader ? 'h3' : 'p');
                 el.textContent = trimmed;
                 resultBody.appendChild(el);
             });
+            document.getElementById('doc-ref').textContent =
+                'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('doc-date').textContent =
+                'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+        }        
             document.getElementById('doc-ref').textContent =
                 'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('doc-date').textContent =
