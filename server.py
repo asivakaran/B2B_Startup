@@ -61,16 +61,12 @@ def generate_brief(
     try:
         plan = call_groq(
             system_msg=(
-                "You are a Senior Account Manager at a premium creative agency. "
-                "Take the user's rough, messy notes from a client and output exactly two sections:\n\n"
-                "SECTION 1: DRAFT BRIEF\n"
-                "Structure exactly what the client asked for into: Project Overview, Business Goals, and Scope. "
-                "Do NOT hallucinate or make up details they didn't mention.\n\n"
-                "SECTION 2: GAP ANALYSIS (MISSING INFO)\n"
-                "Identify what is missing to give an accurate quote. Write exactly 3 hyper-specific questions "
-                "the agency needs to email the client to fill in the blanks. "
-                "Use formal, premium corporate language. "
-                "CRITICAL: Do NOT use any Markdown formatting (no **, no *, no #). Use plain text only. Use ALL-CAPS for section headers."
+                "You are a Senior Account Manager at a premium creative agency. Take the "
+                "user's rough, messy notes from a client and transform them into a highly "
+                "professional, comprehensive Client Brief. Include these sections: "
+                "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
+                "Work, 5. Deliverables. Make logical assumptions to fill in any gaps. Use "
+                "formal, premium corporate language."
             ),
             user_msg=(
                 f"Turn the following rough client notes into a structured client brief:\n"
@@ -378,35 +374,19 @@ async def root():
         function renderBrief(text) {
             const resultBody = document.getElementById('result-body');
             resultBody.innerHTML = '';
-            
-            // Simple string replacement to remove Markdown stars
-            let cleanText = text.split('**').join('').split('*').join('');
-            
-            cleanText.split('\n').forEach(function (line) {
+            text.split('\n').forEach(function (line) {
                 const trimmed = line.trim();
                 if (!trimmed) return;
-                
-                // Check if it's a number (1., 2., 3.) or says "SECTION"
-                const isHeader = (trimmed.indexOf("1.") === 0 || 
-                                  trimmed.indexOf("2.") === 0 || 
-                                  trimmed.indexOf("3.") === 0 || 
-                                  trimmed.indexOf("4.") === 0 || 
-                                  trimmed.indexOf("5.") === 0 || 
-                                  trimmed.indexOf("SECTION") === 0);
-                
-                const el = document.createElement(isHeader ? 'h3' : 'p');
+                const el = document.createElement(/^\d+\.\s/.test(trimmed) ? 'h3' : 'p');
                 el.textContent = trimmed;
                 resultBody.appendChild(el);
             });
-            
-            document.getElementById('doc-ref').textContent = 'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('doc-date').textContent = 'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-        }
             document.getElementById('doc-ref').textContent =
                 'REF: CB-' + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('doc-date').textContent =
                 'DATE: ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-        }        
+        }
+
         async function draftBrief(notes, email) {
             const resultWrap = document.getElementById('result-wrap');
             const btn = document.getElementById('draft-btn');
