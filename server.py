@@ -67,6 +67,7 @@ def generate_brief(
                 "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
                 "Work, 5. Deliverables. Make logical assumptions to fill in any gaps. Use "
                 "formal, premium corporate language."
+                "CRITICAL FORMATTING: Do NOT use any Markdown formatting (no **, no *, no #). Use plain text only. Use ALL-CAPS for section headers."
             ),
             user_msg=(
                 f"Turn the following rough client notes into a structured client brief:\n"
