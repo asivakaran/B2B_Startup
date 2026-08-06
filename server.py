@@ -104,27 +104,23 @@ async def root():
     <title>ClientBrief AI — From Chaos to Strategy in 60 Seconds</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Don't just format messy client notes. Turn them into a strategically brilliant, client-ready brief with KPIs, assumptions, and timelines in under a minute.">
-    <meta name="theme-color" content="#08090f">
+    <meta name="theme-color" content="#F8F5F0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #08090f;
-            --bg-soft: #0f111a;
-            --surface: rgba(255, 255, 255, 0.03);
-            --surface-border: rgba(255, 255, 255, 0.08);
-            --surface-hover: rgba(255, 255, 255, 0.06);
-            --text: #ffffff;
-            --text-muted: #8b8da3;
-            --paper: #ffffff;
-            --paper-ink: #0f111a;
-            --paper-ink-soft: #4a5568;
-            --accent-1: #00f2fe; /* Electric Cyan */
-            --accent-2: #4facfe; /* Bright Blue */
-            --accent-3: #ff007a; /* Neon Magenta */
-            --accent-glow: rgba(0, 242, 254, 0.4);
-            --line: rgba(255, 255, 255, 0.08);
+            --bg: #F8F5F0; /* Warm Paper White */
+            --surface: #FFFFFF;
+            --surface-dark: #111111;
+            --text: #111111; /* Ink Black */
+            --text-muted: #666666;
+            --paper-ink-soft: #555555;
+            --accent: #FF4D00; /* Electric Tangerine */
+            --accent-hover: #E64500;
+            --accent-soft: #FFE5D9;
+            --border: #E5E1D9;
+            --line: rgba(0, 0, 0, 0.08);
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -138,257 +134,227 @@ async def root():
             position: relative;
         }
 
-        /* Vibrant Ambient Background Glows */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -20%;
-            left: -10%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle, rgba(79, 172, 254, 0.15), transparent 60%);
-            filter: blur(80px);
-            z-index: 0;
-            pointer-events: none;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle, rgba(255, 0, 122, 0.12), transparent 60%);
-            filter: blur(80px);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; position: relative; }
         section[id] { scroll-margin-top: 84px; }
         a { color: inherit; text-decoration: none; }
 
         .wordmark {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Fraunces', serif;
             font-weight: 700;
             letter-spacing: -0.02em;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
         }
         .wordmark .logo-dot {
-            width: 10px;
-            height: 10px;
-            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
-            border-radius: 2px;
-            box-shadow: 0 0 12px var(--accent-1);
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
         }
-        .wordmark span { color: var(--accent-1); }
+        .wordmark span { font-style: italic; }
 
         /* ---------- NAV ---------- */
         .topnav {
             position: sticky;
             top: 0;
             z-index: 30;
-            background: rgba(8, 9, 15, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--line);
+            background: rgba(248, 245, 240, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
         }
-        .topnav .wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; }
-        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .topnav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+        .nav-links { display: flex; gap: 36px; list-style: none; }
         .nav-links a { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; transition: color 0.2s ease; }
         .nav-links a:hover { color: var(--text); }
         
         .btn-small {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text);
-            border: 1px solid var(--surface-border);
-            border-radius: 8px;
-            padding: 10px 18px;
+            background: var(--text);
+            color: var(--bg);
+            border: 1px solid var(--text);
+            border-radius: 100px;
+            padding: 10px 20px;
             font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.2s ease;
         }
-        .btn-small:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--accent-1); box-shadow: 0 0 15px var(--accent-glow); }
+        .btn-small:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
         
         @media (max-width: 760px) { .nav-links { display: none; } }
 
         /* ---------- BUTTONS ---------- */
         .btn-primary-lg {
-            background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
-            color: #00121a;
+            background: var(--accent);
+            color: #FFFFFF;
             border: none;
             border-radius: 8px;
-            padding: 16px 28px;
+            padding: 16px 32px;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 600;
             display: inline-block;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
             cursor: pointer;
         }
-        .btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5); }
+        .btn-primary-lg:hover { background: var(--accent-hover); transform: translateY(-2px); }
         
-        .link-muted { color: var(--text-muted); font-size: 0.95rem; border-bottom: 1px dashed var(--text-muted); padding-bottom: 2px; transition: color 0.2s; }
-        .link-muted:hover { color: var(--text); }
+        .link-muted { color: var(--text); font-size: 0.95rem; border-bottom: 1px solid var(--text); padding-bottom: 2px; transition: color 0.2s; }
+        .link-muted:hover { color: var(--accent); border-color: var(--accent); }
 
         /* ---------- HERO ---------- */
-        .hero { padding: 100px 0 120px; text-align: center; }
+        .hero { padding: 120px 0 80px; }
+        .hero .wrap {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: end;
+        }
         .eyebrow {
-            display: inline-block;
-            font-family: 'Space Grotesk', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            color: var(--accent-1);
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            color: var(--accent);
             text-transform: uppercase;
             margin: 0 0 24px;
-            background: rgba(0, 242, 254, 0.08);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 242, 254, 0.2);
+            font-weight: 600;
+        }
+        .eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+            margin-right: 12px;
         }
         .hero h1 {
-            font-family: 'Newsreader', serif;
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1.1;
-            margin: 0 auto 24px;
-            max-width: 900px;
-            letter-spacing: -0.02em;
-            font-weight: 400;
+            font-family: 'Fraunces', serif;
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            line-height: 0.95;
+            margin: 0 0 32px;
+            letter-spacing: -0.03em;
+            font-weight: 600;
         }
         .hero h1 .highlight {
-            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             font-style: italic;
+            color: var(--accent);
+            font-weight: 400;
         }
         .hero .lede { 
             color: var(--text-muted); 
             font-size: 1.15rem; 
             line-height: 1.6; 
-            max-width: 600px; 
-            margin: 0 auto 40px; 
+            max-width: 520px; 
+            margin: 0 0 40px; 
         }
-        .hero-ctas { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .hero-ctas { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
 
-        /* Hero Visual Placeholder */
+        /* Hero Visual */
         .hero-visual {
-            margin-top: 80px;
-            position: relative;
-            padding: 20px;
             background: var(--surface);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 24px;
+            box-shadow: 20px 20px 0px 0px var(--accent-soft);
+            transition: transform 0.3s ease;
         }
-        .ui-mockup {
-            background: var(--bg-soft);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: left;
-            font-family: 'Space Grotesk', monospace;
-            font-size: 0.85rem;
-        }
-        .ui-mockup .dot-row { display: flex; gap: 6px; margin-bottom: 16px; }
-        .ui-mockup .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
-        .ui-mockup .line { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 8px; }
-        .ui-mockup .line.short { width: 40%; }
-        .ui-mockup .line.med { width: 70%; }
-        .ui-mockup .line.accent { background: var(--accent-1); width: 30%; }
+        .hero-visual:hover { transform: translate(-5px, -5px); box-shadow: 25px 25px 0px 0px var(--accent-soft); }
+        .visual-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: 'Inter', sans-serif; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.1em; }
+        .visual-tag { background: var(--text); color: var(--bg); padding: 2px 8px; border-radius: 4px; }
+        .visual-line { height: 8px; background: var(--bg); border-radius: 4px; margin-bottom: 12px; }
+        .visual-line.short { width: 40%; }
+        .visual-line.med { width: 70%; }
+        .visual-line.accent { background: var(--accent); width: 30%; margin-top: 24px; }
 
         /* ---------- SECTION SHELL ---------- */
-        .section { padding: 100px 0; }
+        .section { padding: 100px 0; border-top: 1px solid var(--border); }
         .section-intro { max-width: 700px; margin: 0 auto 60px; text-align: center; }
         .section-intro h2 { 
-            font-family: 'Newsreader', serif; 
-            font-size: clamp(2rem, 4vw, 3rem); 
-            line-height: 1.2;
-            font-weight: 400;
-            letter-spacing: -0.01em;
+            font-family: 'Fraunces', serif; 
+            font-size: clamp(2.5rem, 5vw, 3.5rem); 
+            line-height: 1.1;
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
+        .section-intro h2 em { color: var(--accent); font-weight: 400; }
         .section-intro p { color: var(--text-muted); margin-top: 16px; font-size: 1.1rem; }
 
         /* ---------- HOW IT WORKS ---------- */
-        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
         .step { 
             background: var(--surface); 
-            border: 1px solid var(--surface-border); 
-            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
             padding: 32px; 
             transition: all 0.3s ease;
+            position: relative;
         }
-        .step:hover { border-color: var(--accent-1); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .step:hover { border-color: var(--text); transform: translateY(-4px); }
         .step .step-no { 
-            font-family: 'Space Grotesk', monospace; 
-            color: var(--accent-1); 
-            font-size: 0.9rem; 
-            font-weight: 700; 
-            margin-bottom: 12px; 
+            font-family: 'Fraunces', serif; 
+            color: var(--accent); 
+            font-size: 2rem; 
+            font-weight: 600; 
+            margin-bottom: 16px; 
             display: block;
+            font-style: italic;
         }
         .step h3 { font-family: 'Inter', sans-serif; font-size: 1.25rem; margin: 0 0 12px; font-weight: 600; }
         .step p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
         @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
 
         /* ---------- WHY / FEATURES ---------- */
-        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
         .feature-card { 
-            background: var(--surface); 
-            border: 1px solid var(--surface-border); 
-            border-radius: 12px; 
-            padding: 32px;
+            background: var(--bg); 
+            border-right: 1px solid var(--border); 
+            border-bottom: 1px solid var(--border); 
+            padding: 40px;
             position: relative;
             overflow: hidden;
+            transition: background 0.3s ease;
         }
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--accent-1), var(--accent-3));
-        }
-        .feature-card h3 { font-family: 'Inter', sans-serif; font-size: 1.2rem; margin: 0 0 12px; font-weight: 600; }
-        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .feature-card:hover { background: var(--surface); }
+        .feature-card .icon { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 24px; font-family: 'Fraunces', serif; font-style: italic; }
+        .feature-card h3 { font-family: 'Fraunces', serif; font-size: 1.5rem; margin: 0 0 12px; font-weight: 600; }
+        .feature-card p { color: var(--text-muted); font-size: 1rem; line-height: 1.6; }
         @media (max-width: 720px) { .features-grid { grid-template-columns: 1fr; } }
 
         /* ---------- TOOL ---------- */
-        .tool-inner { max-width: 680px; margin: 0 auto; }
+        .tool-inner { max-width: 760px; margin: 0 auto; }
         .card { 
             background: var(--surface); 
-            border: 1px solid var(--surface-border); 
-            border-radius: 16px; 
-            padding: 32px; 
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 40px; 
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.05);
         }
         .field-label {
-            font-family: 'Space Grotesk', monospace; 
+            font-family: 'Inter', sans-serif; 
             font-size: 0.8rem; letter-spacing: 0.1em;
             color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 12px;
             font-weight: 600;
         }
         textarea#notes-input {
-            width: 100%; min-height: 160px; resize: vertical; background: var(--bg-soft);
-            border: 1px solid var(--surface-border); border-radius: 8px; color: var(--text);
+            width: 100%; min-height: 160px; resize: vertical; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 4px; color: var(--text);
             font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.5; padding: 16px; outline: none;
             transition: border-color 0.2s;
         }
-        textarea#notes-input::placeholder { color: #555; }
-        textarea#notes-input:focus-visible { border-color: var(--accent-1); box-shadow: 0 0 0 3px var(--accent-glow); }
+        textarea#notes-input::placeholder { color: #999; }
+        textarea#notes-input:focus-visible { border-color: var(--accent); }
         
-        .error-text { display: none; color: var(--accent-3); font-size: 0.9rem; margin-top: 8px; }
+        .error-text { display: none; color: var(--accent); font-size: 0.9rem; margin-top: 8px; }
         .error-text.visible { display: block; }
         
-        button.primary { /* overrides btn-primary-lg just in case */
+        button.primary {
             margin-top: 20px; width: 100%; 
         }
 
         /* Document Output */
-        .doc-wrap { display: none; width: 100%; max-width: 680px; margin: 40px auto 0; }
+        .doc-wrap { display: none; width: 100%; max-width: 760px; margin: 40px auto 0; }
         .doc-wrap.visible { display: block; animation: slideUp 0.5s ease; }
         
         @keyframes slideUp {
@@ -397,83 +363,89 @@ async def root():
         }
 
         .doc {
-            background: var(--paper);
-            color: var(--paper-ink);
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 48px;
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+            padding: 60px;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.1);
             position: relative;
         }
         .doc-letterhead {
             display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-            font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.1em;
-            color: var(--paper-ink-soft); text-transform: uppercase;
-            border-bottom: 2px solid var(--paper-ink); padding-bottom: 16px; margin-bottom: 24px;
+            font-family: 'Inter', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em;
+            color: var(--text-muted); text-transform: uppercase;
+            border-bottom: 2px solid var(--text); padding-bottom: 16px; margin-bottom: 32px;
             font-weight: 600;
         }
-        .status-tag { background: var(--paper-ink); color: var(--paper); border-radius: 4px; padding: 2px 8px; }
+        .status-tag { background: var(--accent); color: #fff; border-radius: 4px; padding: 2px 8px; }
         
-        .doc h3 { font-family: 'Newsreader', serif; font-size: 1.3rem; margin: 24px 0 8px; font-weight: 600; }
+        .doc h3 { font-family: 'Fraunces', serif; font-size: 1.4rem; margin: 32px 0 8px; font-weight: 600; }
         .doc h3:first-child { margin-top: 0; }
-        .doc p { font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.7; margin: 0 0 8px; color: #333; }
+        .doc p { font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.7; margin: 0 0 8px; color: var(--paper-ink-soft); }
         
         .copy-link {
-            display: block; margin: 20px auto 0; background: var(--bg-soft); border: 1px solid var(--surface-border); color: var(--text);
-            font-family: 'Space Grotesk', monospace; font-size: 0.85rem; letter-spacing: 0.05em;
-            text-transform: uppercase; cursor: pointer; padding: 12px 24px; border-radius: 8px; transition: all 0.2s;
+            display: block; margin: 24px auto 0; background: var(--bg); border: 1px solid var(--text); color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; letter-spacing: 0.05em;
+            text-transform: uppercase; cursor: pointer; padding: 12px 24px; border-radius: 100px; transition: all 0.2s; font-weight: 600;
         }
-        .copy-link:hover { border-color: var(--accent-1); color: var(--accent-1); }
+        .copy-link:hover { background: var(--text); color: var(--bg); }
 
         /* ---------- FAQ ---------- */
-        .faq-list { max-width: 760px; margin: 0 auto; border-top: 1px solid var(--line); }
-        .faq-item { border-bottom: 1px solid var(--line); padding: 24px 0; }
+        .faq-list { max-width: 800px; margin: 0 auto; border-top: 1px solid var(--border); }
+        .faq-item { border-bottom: 1px solid var(--border); padding: 32px 0; }
         .faq-item summary {
             cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;
-            gap: 16px; font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 500;
+            gap: 16px; font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 500;
         }
         .faq-item summary::-webkit-details-marker { display: none; }
-        .faq-item summary::after { content: '+'; font-family: 'Space Grotesk', monospace; color: var(--accent-1); font-size: 1.5rem; flex-shrink: 0; }
+        .faq-item summary::after { content: '+'; font-family: 'Inter', sans-serif; color: var(--accent); font-size: 1.5rem; flex-shrink: 0; font-weight: 300; }
         .faq-item[open] summary::after { content: '−'; }
-        .faq-item .faq-answer { color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin: 16px 0 0; max-width: 680px; }
+        .faq-item .faq-answer { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin: 16px 0 0; max-width: 700px; }
 
         /* ---------- FOOTER ---------- */
-        .site-footer { padding: 80px 0 60px; border-top: 1px solid var(--line); text-align: center; }
-        .site-footer .foot-tagline { color: var(--text-muted); max-width: 500px; margin: 16px auto 30px; font-size: 1rem; line-height: 1.6; }
-        .site-footer .small { color: var(--text-muted); opacity: 0.5; font-size: 0.85rem; margin-top: 40px; font-family: 'Space Grotesk', monospace; }
+        .site-footer { padding: 100px 0 60px; background: var(--surface-dark); color: #fff; }
+        .site-footer .wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .site-footer .wordmark { color: #fff; margin-bottom: 20px; }
+        .site-footer .wordmark .logo-dot { background: var(--accent); }
+        .site-footer .foot-tagline { color: rgba(255,255,255,0.7); max-width: 500px; margin: 0 0 30px; font-size: 1.1rem; line-height: 1.6; }
+        .site-footer .small { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-top: 60px; font-family: 'Inter', sans-serif; }
 
         /* ---------- EMAIL GATE ---------- */
         .gate-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(8, 9, 15, 0.85);
+            display: none; position: fixed; inset: 0; background: rgba(17, 17, 17, 0.6);
             backdrop-filter: blur(8px);
             align-items: center; justify-content: center; padding: 20px; z-index: 100;
         }
         .gate-overlay.visible { display: flex; }
         .gate-card {
-            background: var(--bg-soft); border: 1px solid var(--surface-border); border-radius: 16px;
-            padding: 40px; max-width: 420px; width: 100%; text-align: center; position: relative;
-            box-shadow: 0 0 40px rgba(0, 242, 254, 0.1);
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            padding: 48px; max-width: 440px; width: 100%; text-align: center; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
         .gate-seal {
-            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); border-radius: 12px; margin: 0 auto 24px;
+            width: 56px; height: 56px; background: var(--accent); border-radius: 50%; margin: 0 auto 24px;
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Space Grotesk', sans-serif; color: #000; font-size: 1.2rem; font-weight: 700;
+            font-family: 'Fraunces', serif; color: #fff; font-size: 1.2rem; font-weight: 700; font-style: italic;
         }
-        .gate-card h2 { font-family: 'Newsreader', serif; font-size: 1.8rem; margin: 0 0 12px; font-weight: 400; }
-        .gate-card .gate-copy { color: var(--text-muted); font-size: 0.95rem; margin: 0 0 24px; line-height: 1.5; }
+        .gate-card h2 { font-family: 'Fraunces', serif; font-size: 2rem; margin: 0 0 12px; font-weight: 600; }
+        .gate-card .gate-copy { color: var(--text-muted); font-size: 1rem; margin: 0 0 24px; line-height: 1.5; }
         input#gate-email {
-            width: 100%; background: var(--bg); border: 1px solid var(--surface-border); border-radius: 8px;
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
             color: var(--text); font-family: 'Inter', sans-serif; font-size: 1rem;
             padding: 14px 16px; outline: none; margin-bottom: 12px; transition: border-color 0.2s;
         }
-        input#gate-email::placeholder { color: #444; }
-        input#gate-email:focus-visible { border-color: var(--accent-1); }
+        input#gate-email::placeholder { color: #999; }
+        input#gate-email:focus-visible { border-color: var(--accent); }
         .gate-close {
             position: absolute; top: 16px; right: 16px; background: none; border: none;
             color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1;
         }
 
         @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-        @media (max-width: 480px) {
+        @media (max-width: 880px) {
+            .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
+            .hero-visual { display: none; }
             .doc { padding: 32px 24px; }
             .card { padding: 24px; }
             .gate-card { padding: 32px 24px; }
@@ -485,10 +457,10 @@ async def root():
         <div class="wrap">
             <div class="wordmark">
                 <div class="logo-dot"></div>
-                Client<span>Brief</span> AI
+                Client<span>Brief</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#how">How it Works</a></li>
+                <li><a href="#how">Process</a></li>
                 <li><a href="#why">The Edge</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
@@ -498,29 +470,27 @@ async def root():
 
     <header class="hero">
         <div class="wrap">
-            <p class="eyebrow">The Strategist's Edge</p>
-            <h1>Turn Client Chaos into <span class="highlight">Billable Strategy</span> in 60 Seconds.</h1>
-            <p class="lede">Stop wrangling messy notes into formatting. Paste the rambling email, and get back a comprehensive, strategically sound brief complete with KPIs, timelines, and inferred insights. It's like having a Senior Strategist on call.</p>
-            <div class="hero-ctas">
-                <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
-                <a href="#why" class="link-muted">See the strategic edge ↓</a>
+            <div class="hero-copy">
+                <p class="eyebrow">The Strategist's Edge</p>
+                <h1>Turn Client <span class="highlight">Chaos</span> into Creative Strategy.</h1>
+                <p class="lede">Stop wrangling messy notes into formatting. Paste the rambling email, and get back a comprehensive, strategically sound brief complete with KPIs, timelines, and inferred insights. It's like having a Senior Strategist on call.</p>
+                <div class="hero-ctas">
+                    <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
+                    <a href="#why" class="link-muted">See the strategic edge</a>
+                </div>
             </div>
             
             <div class="hero-visual">
-                <div class="ui-mockup">
-                    <div class="dot-row">
-                        <div class="dot" style="background:#ff5f56"></div>
-                        <div class="dot" style="background:#ffbd2e"></div>
-                        <div class="dot" style="background:#27c93f"></div>
-                    </div>
-                    <div class="line med"></div>
-                    <div class="line short"></div>
-                    <div class="line" style="margin-top:20px"></div>
-                    <div class="line med"></div>
-                    <div class="line short"></div>
-                    <div class="line accent" style="margin-top:20px"></div>
-                    <div class="line"></div>
+                <div class="visual-header">
+                    <span>BRIEF_001.PROOF</span>
+                    <span class="visual-tag">DRAFT</span>
                 </div>
+                <div class="visual-line med"></div>
+                <div class="visual-line short"></div>
+                <div class="visual-line"></div>
+                <div class="visual-line med"></div>
+                <div class="visual-line accent"></div>
+                <div class="visual-line short"></div>
             </div>
         </div>
     </header>
@@ -528,22 +498,22 @@ async def root():
     <section class="section" id="how">
         <div class="wrap">
             <div class="section-intro">
-                <h2>From brain-dump to boardroom-ready.</h2>
+                <h2>From brain-dump to <em>boardroom-ready.</em></h2>
                 <p>Three steps to a brief that actually moves the project forward.</p>
             </div>
             <div class="steps">
                 <div class="step">
-                    <span class="step-no">01 / INPUT</span>
+                    <span class="step-no">01</span>
                     <h3>Paste the Chaos</h3>
                     <p>An email thread, a rushed Slack message, or a messy call transcript. However it arrived, just paste it in.</p>
                 </div>
                 <div class="step">
-                    <span class="step-no">02 / STRATEGY</span>
+                    <span class="step-no">02</span>
                     <h3>AI Fills the Gaps</h3>
                     <p>The engine generates a 7-section brief, logically inferring target audience, suggesting KPIs, and projecting a timeline.</p>
                 </div>
                 <div class="step">
-                    <span class="step-no">03 / DELIVER</span>
+                    <span class="step-no">03</span>
                     <h3>Send with Confidence</h3>
                     <p>Copy the pristine, professionally formatted document straight into your proposal, deck, or project management tool.</p>
                 </div>
@@ -551,26 +521,30 @@ async def root():
         </div>
     </section>
 
-    <section class="section" id="why">
+    <section class="section" id="why" style="background: var(--surface);">
         <div class="wrap">
             <div class="section-intro">
-                <h2>The Factor That Makes You Prefer It.</h2>
+                <h2>The Factor That Makes <em>You Prefer It.</em></h2>
                 <p>Anyone can format text. We strategize it.</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
+                    <div class="icon">A</div>
                     <h3>Strategic Assumptions</h3>
                     <p>Clients never give you everything. Our AI explicitly lists the strategic gaps it filled, so you know exactly what to validate before the kickoff.</p>
                 </div>
                 <div class="feature-card">
+                    <div class="icon">B</div>
                     <h3>Projected KPIs & Metrics</h3>
                     <p>A brief isn't a brief without success metrics. The tool automatically suggests relevant KPIs based on the inferred business goals.</p>
                 </div>
                 <div class="feature-card">
+                    <div class="icon">C</div>
                     <h3>Suggested Timelines</h3>
                     <p>Stop guessing how long things will take. The AI drafts a logical, phased timeline based on the scope of work requested.</p>
                 </div>
                 <div class="feature-card">
+                    <div class="icon">D</div>
                     <h3>Elite Agency Tone</h3>
                     <p>Reads like it was written by a Senior Account Director. Confident, formal, and completely free of chatbot clichés.</p>
                 </div>
@@ -578,11 +552,11 @@ async def root():
         </div>
     </section>
 
-    <section class="section tool" id="tool" style="background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+    <section class="section tool" id="tool">
         <div class="wrap">
             <div class="section-intro">
                 <p class="eyebrow">The Generator</p>
-                <h2>Give this one a job number.</h2>
+                <h2>Give this one a <em>job number.</em></h2>
             </div>
             <div class="tool-inner">
                 <div class="card">
@@ -610,7 +584,7 @@ async def root():
     <section class="section" id="faq">
         <div class="wrap">
             <div class="section-intro">
-                <h2>Questions, answered.</h2>
+                <h2>Questions, <em>answered.</em></h2>
             </div>
             <div class="faq-list">
                 <details class="faq-item">
@@ -637,7 +611,7 @@ async def root():
         <div class="wrap">
             <div class="wordmark">
                 <div class="logo-dot"></div>
-                Client<span>Brief</span> AI
+                Client<span>Brief</span>
             </div>
             <p class="foot-tagline">Stop formatting text. Start delivering strategy. Built for agencies who value billable hours over busywork.</p>
             <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
