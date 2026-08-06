@@ -59,22 +59,25 @@ def generate_brief(
         return JSONResponse(status_code=500, content={"error": "GROQ_API_KEY not set in environment."})
 
     try:
+        # UPGRADED PROMPT: The "Strategist's Edge"
         plan = call_groq(
             system_msg=(
-                "You are a Senior Account Manager at a premium creative agency. Take the "
+                "You are a Senior Strategy Director at an elite, top-tier creative agency. Take the "
                 "user's rough, messy notes from a client and transform them into a highly "
-                "professional, comprehensive Client Brief. Include these sections: "
-                "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
-                "Work, 5. Deliverables. Make logical assumptions to fill in any gaps. Use "
-                "formal, premium corporate language."
+                "professional, comprehensive, and strategically brilliant Client Brief. "
+                "Do not just summarize; elevate. Include these sections: "
+                "1. Project Overview, 2. Business Goals & KPIs, 3. Target Audience & Insights, 4. Scope of "
+                "Work, 5. Deliverables, 6. Strategic Assumptions (explain what you logically inferred to fill in the client's blanks), "
+                "7. Suggested Timeline. Make logical, brilliant assumptions to fill in any gaps. Use "
+                "formal, premium corporate language that exudes confidence. "
                 "CRITICAL FORMATTING: Do NOT use any Markdown formatting (no **, no *, no #). Use plain text only. Use ALL-CAPS for section headers."
             ),
             user_msg=(
-                f"Turn the following rough client notes into a structured client brief:\n"
+                f"Turn the following rough client notes into a structured, strategic client brief:\n"
                 f"Client notes: {notes}\n"
-                f"List each section as 1., 2., 3., 4., 5."
+                f"List each section as 1., 2., 3., 4., 5., 6., 7."
             ),
-            max_tokens=512,
+            max_tokens=800,  # Increased token limit to accommodate the deeper strategy
         )
     except RuntimeError as e:
         return JSONResponse(status_code=502, content={"error": str(e)})
@@ -98,314 +101,395 @@ async def root():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ClientBrief AI — Client Briefs for Marketing Agencies</title>
+    <title>ClientBrief AI — From Chaos to Strategy in 60 Seconds</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Paste messy client notes and get back a structured, client-ready brief in under a minute. Built for marketing and creative agencies.">
-    <meta name="theme-color" content="#1c1611">
+    <meta name="description" content="Don't just format messy client notes. Turn them into a strategically brilliant, client-ready brief with KPIs, assumptions, and timelines in under a minute.">
+    <meta name="theme-color" content="#08090f">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #1c1611;
-            --surface: #251d16;
-            --surface-border: #3a2d1f;
-            --text: #ece4d3;
-            --text-muted: #93877b;
-            --paper: #ddd0a8;
-            --paper-ink: #2b2013;
-            --paper-ink-soft: #5f4d34;
-            --pink: #b3606b;
-            --pink-bright: #c47680;
-            --gold: #b28d3c;
-            --line: rgba(236, 228, 211, 0.09);
+            --bg: #08090f;
+            --bg-soft: #0f111a;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --surface-hover: rgba(255, 255, 255, 0.06);
+            --text: #ffffff;
+            --text-muted: #8b8da3;
+            --paper: #ffffff;
+            --paper-ink: #0f111a;
+            --paper-ink-soft: #4a5568;
+            --accent-1: #00f2fe; /* Electric Cyan */
+            --accent-2: #4facfe; /* Bright Blue */
+            --accent-3: #ff007a; /* Neon Magenta */
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --line: rgba(255, 255, 255, 0.08);
         }
-        html { scroll-behavior: smooth; }
-        * { box-sizing: border-box; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            margin: 0;
             background: var(--bg);
             color: var(--text);
-            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            position: relative;
         }
-        .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+        /* Vibrant Ambient Background Glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.15), transparent 60%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(255, 0, 122, 0.12), transparent 60%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
         section[id] { scroll-margin-top: 84px; }
-        a { color: inherit; }
+        a { color: inherit; text-decoration: none; }
 
         .wordmark {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-weight: 600;
-            letter-spacing: 0.01em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             display: inline-flex;
-            align-items: baseline;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
         }
-        .wordmark span { color: var(--pink); }
+        .wordmark .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--accent-1);
+        }
+        .wordmark span { color: var(--accent-1); }
 
         /* ---------- NAV ---------- */
         .topnav {
             position: sticky;
             top: 0;
             z-index: 30;
-            background: rgba(28, 22, 17, 0.88);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(8, 9, 15, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--line);
         }
-        .topnav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .topnav .wordmark { font-size: 1.2rem; }
-        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; }
-        .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.88rem; transition: color 0.15s ease; }
+        .topnav .wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; transition: color 0.2s ease; }
         .nav-links a:hover { color: var(--text); }
-        .nav-links a:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 3px; }
+        
         .btn-small {
-            display: inline-block;
-            background: var(--pink);
-            color: #fbf3e9;
-            border: none;
-            border-radius: 7px;
-            padding: 9px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 10px 18px;
             font-size: 0.85rem;
             font-weight: 600;
-            text-decoration: none;
-            transition: background 0.15s ease;
+            transition: all 0.2s ease;
         }
-        .btn-small:hover { background: var(--pink-bright); }
-        .btn-small:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
+        .btn-small:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--accent-1); box-shadow: 0 0 15px var(--accent-glow); }
+        
         @media (max-width: 760px) { .nav-links { display: none; } }
 
-        /* ---------- HERO ---------- */
-        .hero { padding: 88px 0 90px; }
-        .hero .wrap {
-            display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            gap: 60px;
-            align-items: center;
-        }
-        .eyebrow {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.72rem;
-            letter-spacing: 0.16em;
-            color: var(--gold);
-            text-transform: uppercase;
-            margin: 0 0 18px;
-        }
-        .hero h1 {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: clamp(2.1rem, 4vw, 3rem);
-            line-height: 1.16;
-            margin: 0 0 20px;
-            max-width: 540px;
-        }
-        .hero .lede { color: var(--text-muted); font-size: 1.04rem; line-height: 1.65; max-width: 440px; margin: 0 0 32px; }
-        .hero-ctas { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        /* ---------- BUTTONS ---------- */
         .btn-primary-lg {
-            background: var(--pink);
-            color: #fbf3e9;
+            background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+            color: #00121a;
             border: none;
             border-radius: 8px;
-            padding: 14px 26px;
-            font-size: 0.98rem;
-            font-weight: 600;
-            text-decoration: none;
+            padding: 16px 28px;
+            font-size: 1rem;
+            font-weight: 700;
             display: inline-block;
-            transition: background 0.15s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
+            cursor: pointer;
         }
-        .btn-primary-lg:hover { background: var(--pink-bright); }
-        .btn-primary-lg:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
-        .link-muted { color: var(--text-muted); text-decoration: none; font-size: 0.92rem; border-bottom: 1px dashed var(--surface-border); padding-bottom: 2px; }
+        .btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5); }
+        
+        .link-muted { color: var(--text-muted); font-size: 0.95rem; border-bottom: 1px dashed var(--text-muted); padding-bottom: 2px; transition: color 0.2s; }
         .link-muted:hover { color: var(--text); }
-        @media (max-width: 880px) {
-            .hero .wrap { grid-template-columns: 1fr; }
-            .hero h1, .hero .lede { max-width: none; }
-        }
 
-        /* ---------- HERO DEMO (before / after) ---------- */
-        .demo { display: flex; align-items: stretch; gap: 14px; }
-        .demo-panel { flex: 1; min-width: 0; border-radius: 10px; padding: 20px; }
-        .demo-panel.raw { background: var(--surface); border: 1px solid var(--surface-border); }
-        .demo-panel.filed { background: var(--paper); color: var(--paper-ink); }
-        .demo-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; }
-        .demo-panel.raw .demo-label { color: var(--text-muted); }
-        .demo-panel.filed .demo-label { color: var(--paper-ink-soft); }
-        .demo-panel.raw p { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #beb2a2; line-height: 1.7; margin: 0 0 3px; }
-        .demo-panel.filed h4 { font-family: 'Source Serif 4', serif; font-size: 0.82rem; margin: 12px 0 3px; }
-        .demo-panel.filed h4:first-of-type { margin-top: 0; }
-        .demo-panel.filed p { font-family: 'Source Serif 4', serif; font-size: 0.78rem; color: var(--paper-ink-soft); line-height: 1.5; margin: 0 0 2px; }
-        .demo-arrow {
-            flex-shrink: 0; align-self: center; width: 30px; height: 30px; border-radius: 50%;
-            border: 1px solid var(--surface-border); display: flex; align-items: center; justify-content: center;
-            color: var(--gold); font-size: 0.85rem;
+        /* ---------- HERO ---------- */
+        .hero { padding: 100px 0 120px; text-align: center; }
+        .eyebrow {
+            display: inline-block;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: var(--accent-1);
+            text-transform: uppercase;
+            margin: 0 0 24px;
+            background: rgba(0, 242, 254, 0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
         }
-        @media (max-width: 560px) {
-            .demo { flex-direction: column; }
-            .demo-arrow { transform: rotate(90deg); }
+        .hero h1 {
+            font-family: 'Newsreader', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin: 0 auto 24px;
+            max-width: 900px;
+            letter-spacing: -0.02em;
+            font-weight: 400;
         }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+        }
+        .hero .lede { 
+            color: var(--text-muted); 
+            font-size: 1.15rem; 
+            line-height: 1.6; 
+            max-width: 600px; 
+            margin: 0 auto 40px; 
+        }
+        .hero-ctas { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+
+        /* Hero Visual Placeholder */
+        .hero-visual {
+            margin-top: 80px;
+            position: relative;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .ui-mockup {
+            background: var(--bg-soft);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 0.85rem;
+        }
+        .ui-mockup .dot-row { display: flex; gap: 6px; margin-bottom: 16px; }
+        .ui-mockup .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .ui-mockup .line { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 8px; }
+        .ui-mockup .line.short { width: 40%; }
+        .ui-mockup .line.med { width: 70%; }
+        .ui-mockup .line.accent { background: var(--accent-1); width: 30%; }
 
         /* ---------- SECTION SHELL ---------- */
-        .section { padding: 80px 0; }
-        .section-intro { max-width: 600px; margin: 0 auto 44px; text-align: center; }
-        .section-intro h2 { font-family: 'Source Serif 4', serif; font-size: clamp(1.55rem, 3vw, 2.05rem); margin: 0; line-height: 1.3; }
+        .section { padding: 100px 0; }
+        .section-intro { max-width: 700px; margin: 0 auto 60px; text-align: center; }
+        .section-intro h2 { 
+            font-family: 'Newsreader', serif; 
+            font-size: clamp(2rem, 4vw, 3rem); 
+            line-height: 1.2;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+        .section-intro p { color: var(--text-muted); margin-top: 16px; font-size: 1.1rem; }
 
         /* ---------- HOW IT WORKS ---------- */
-        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .step { border-top: 2px solid var(--pink); padding-top: 20px; }
-        .step .step-no { font-family: 'IBM Plex Mono', monospace; color: var(--text-muted); font-size: 0.76rem; letter-spacing: 0.1em; }
-        .step h3 { font-family: 'Source Serif 4', serif; font-size: 1.12rem; margin: 10px 0 8px; }
-        .step p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.65; margin: 0; }
-        @media (max-width: 820px) { .steps { grid-template-columns: 1fr; gap: 26px; } }
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .step { 
+            background: var(--surface); 
+            border: 1px solid var(--surface-border); 
+            border-radius: 12px; 
+            padding: 32px; 
+            transition: all 0.3s ease;
+        }
+        .step:hover { border-color: var(--accent-1); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .step .step-no { 
+            font-family: 'Space Grotesk', monospace; 
+            color: var(--accent-1); 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            display: block;
+        }
+        .step h3 { font-family: 'Inter', sans-serif; font-size: 1.25rem; margin: 0 0 12px; font-weight: 600; }
+        .step p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
 
         /* ---------- WHY / FEATURES ---------- */
-        .why { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .feature-card { background: var(--bg); border: 1px solid var(--surface-border); border-radius: 10px; padding: 26px; }
-        .feature-card h3 { font-family: 'Source Serif 4', serif; font-size: 1.03rem; margin: 0 0 10px; }
-        .feature-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.65; margin: 0; }
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .feature-card { 
+            background: var(--surface); 
+            border: 1px solid var(--surface-border); 
+            border-radius: 12px; 
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-1), var(--accent-3));
+        }
+        .feature-card h3 { font-family: 'Inter', sans-serif; font-size: 1.2rem; margin: 0 0 12px; font-weight: 600; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
         @media (max-width: 720px) { .features-grid { grid-template-columns: 1fr; } }
 
         /* ---------- TOOL ---------- */
-        .tool-inner { max-width: 560px; margin: 0 auto; }
-        .card { background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px; padding: 28px; width: 100%; }
+        .tool-inner { max-width: 680px; margin: 0 auto; }
+        .card { 
+            background: var(--surface); 
+            border: 1px solid var(--surface-border); 
+            border-radius: 16px; 
+            padding: 32px; 
+            backdrop-filter: blur(10px);
+        }
         .field-label {
-            font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em;
-            color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 10px;
+            font-family: 'Space Grotesk', monospace; 
+            font-size: 0.8rem; letter-spacing: 0.1em;
+            color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 12px;
+            font-weight: 600;
         }
         textarea#notes-input {
-            width: 100%; min-height: 140px; resize: vertical; background: #14100c;
+            width: 100%; min-height: 160px; resize: vertical; background: var(--bg-soft);
             border: 1px solid var(--surface-border); border-radius: 8px; color: var(--text);
-            font-family: 'IBM Plex Sans', sans-serif; font-size: 0.96rem; line-height: 1.5; padding: 14px; outline: none;
+            font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.5; padding: 16px; outline: none;
+            transition: border-color 0.2s;
         }
-        textarea#notes-input:focus-visible { border-color: var(--pink); }
-        .error-text { display: none; color: #e0a3ab; font-size: 0.85rem; margin-top: 8px; }
+        textarea#notes-input::placeholder { color: #555; }
+        textarea#notes-input:focus-visible { border-color: var(--accent-1); box-shadow: 0 0 0 3px var(--accent-glow); }
+        
+        .error-text { display: none; color: var(--accent-3); font-size: 0.9rem; margin-top: 8px; }
         .error-text.visible { display: block; }
-        button.primary {
-            margin-top: 16px; width: 100%; background: var(--pink); color: #fbf3e9; border: none;
-            border-radius: 8px; padding: 13px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.98rem;
-            font-weight: 600; cursor: pointer; transition: background 0.15s ease;
+        
+        button.primary { /* overrides btn-primary-lg just in case */
+            margin-top: 20px; width: 100%; 
         }
-        button.primary:hover { background: var(--pink-bright); }
-        button.primary:disabled { opacity: 0.6; cursor: default; }
-        button.primary:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
 
-        .doc-wrap { display: none; width: 100%; max-width: 560px; margin: 34px auto 0; }
-        .doc-wrap.visible { display: block; }
-        .doc-stack { position: relative; }
-        .doc-stack::before,
-        .doc-stack::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 4px;
+        /* Document Output */
+        .doc-wrap { display: none; width: 100%; max-width: 680px; margin: 40px auto 0; }
+        .doc-wrap.visible { display: block; animation: slideUp 0.5s ease; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .doc-stack::before { background: var(--gold); transform: rotate(-2.5deg) translate(7px, 11px); z-index: 0; }
-        .doc-stack::after { background: var(--pink); transform: rotate(-1.1deg) translate(3px, 6px); z-index: 1; }
+
         .doc {
-            position: relative;
-            z-index: 2;
             background: var(--paper);
             color: var(--paper-ink);
-            border-radius: 4px;
-            padding: 36px 40px;
-            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 48px;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+            position: relative;
         }
         .doc-letterhead {
-            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
-            font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+            font-family: 'Space Grotesk', monospace; font-size: 0.75rem; letter-spacing: 0.1em;
             color: var(--paper-ink-soft); text-transform: uppercase;
-            border-bottom: 1px solid rgba(43, 32, 19, 0.25); padding-bottom: 12px; margin-bottom: 20px;
+            border-bottom: 2px solid var(--paper-ink); padding-bottom: 16px; margin-bottom: 24px;
+            font-weight: 600;
         }
-        .status-tag { border: 1px solid var(--paper-ink-soft); border-radius: 4px; padding: 1px 8px; }
-        .doc h3 { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.08rem; margin: 22px 0 6px; }
+        .status-tag { background: var(--paper-ink); color: var(--paper); border-radius: 4px; padding: 2px 8px; }
+        
+        .doc h3 { font-family: 'Newsreader', serif; font-size: 1.3rem; margin: 24px 0 8px; font-weight: 600; }
         .doc h3:first-child { margin-top: 0; }
-        .doc p { font-family: 'Source Serif 4', Georgia, serif; font-size: 0.98rem; line-height: 1.65; margin: 0 0 6px; }
-        .copy-legend {
-            display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px;
-            font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.05em;
-            color: var(--text-muted); text-transform: uppercase;
-        }
-        .copy-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
-        .dot-cream { background: var(--paper); border: 1px solid var(--surface-border); }
-        .dot-gold { background: var(--gold); }
-        .dot-pink { background: var(--pink); }
+        .doc p { font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.7; margin: 0 0 8px; color: #333; }
+        
         .copy-link {
-            display: inline-block; margin-top: 14px; background: none; border: none; color: var(--text-muted);
-            font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; letter-spacing: 0.06em;
-            text-transform: uppercase; cursor: pointer; padding: 0;
+            display: block; margin: 20px auto 0; background: var(--bg-soft); border: 1px solid var(--surface-border); color: var(--text);
+            font-family: 'Space Grotesk', monospace; font-size: 0.85rem; letter-spacing: 0.05em;
+            text-transform: uppercase; cursor: pointer; padding: 12px 24px; border-radius: 8px; transition: all 0.2s;
         }
-        .copy-link:hover { color: var(--text); }
-
-        /* ---------- ROUTING / SIGN-OFF STRIP ---------- */
-        .routing { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-        .routing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        .routing-stub {
-            border: 1px dashed var(--surface-border); border-radius: 8px; padding: 20px;
-        }
-        .routing-stub .role { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
-        .routing-stub p { font-family: 'Source Serif 4', serif; font-style: italic; font-size: 0.94rem; line-height: 1.6; margin: 0; color: var(--text); }
-        @media (max-width: 820px) { .routing-grid { grid-template-columns: 1fr; } }
+        .copy-link:hover { border-color: var(--accent-1); color: var(--accent-1); }
 
         /* ---------- FAQ ---------- */
-        .faq-list { border-top: 1px solid var(--line); max-width: 740px; margin: 0 auto; }
-        .faq-item { border-bottom: 1px solid var(--line); padding: 20px 0; }
+        .faq-list { max-width: 760px; margin: 0 auto; border-top: 1px solid var(--line); }
+        .faq-item { border-bottom: 1px solid var(--line); padding: 24px 0; }
         .faq-item summary {
             cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;
-            gap: 16px; font-family: 'Source Serif 4', serif; font-size: 1.03rem;
+            gap: 16px; font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 500;
         }
         .faq-item summary::-webkit-details-marker { display: none; }
-        .faq-item summary::after { content: '+'; font-family: 'IBM Plex Mono', monospace; color: var(--text-muted); font-size: 1.1rem; flex-shrink: 0; }
+        .faq-item summary::after { content: '+'; font-family: 'Space Grotesk', monospace; color: var(--accent-1); font-size: 1.5rem; flex-shrink: 0; }
         .faq-item[open] summary::after { content: '−'; }
-        .faq-item summary:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 3px; }
-        .faq-item .faq-answer { color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; margin: 14px 0 0; max-width: 620px; }
+        .faq-item .faq-answer { color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin: 16px 0 0; max-width: 680px; }
 
         /* ---------- FOOTER ---------- */
-        .site-footer { padding: 60px 0 54px; border-top: 1px solid var(--line); text-align: center; }
-        .site-footer .wordmark { font-size: 1.3rem; justify-content: center; margin-bottom: 12px; }
-        .site-footer .foot-tagline { color: var(--text-muted); max-width: 420px; margin: 0 auto 26px; font-size: 0.92rem; line-height: 1.6; }
-        .site-footer .small { color: var(--text-muted); opacity: 0.7; font-size: 0.78rem; margin-top: 26px; }
+        .site-footer { padding: 80px 0 60px; border-top: 1px solid var(--line); text-align: center; }
+        .site-footer .foot-tagline { color: var(--text-muted); max-width: 500px; margin: 16px auto 30px; font-size: 1rem; line-height: 1.6; }
+        .site-footer .small { color: var(--text-muted); opacity: 0.5; font-size: 0.85rem; margin-top: 40px; font-family: 'Space Grotesk', monospace; }
 
         /* ---------- EMAIL GATE ---------- */
         .gate-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(10, 8, 6, 0.72);
-            align-items: center; justify-content: center; padding: 20px; z-index: 40;
+            display: none; position: fixed; inset: 0; background: rgba(8, 9, 15, 0.85);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center; padding: 20px; z-index: 100;
         }
         .gate-overlay.visible { display: flex; }
         .gate-card {
-            background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px;
-            padding: 32px; max-width: 380px; width: 100%; text-align: center; position: relative;
+            background: var(--bg-soft); border: 1px solid var(--surface-border); border-radius: 16px;
+            padding: 40px; max-width: 420px; width: 100%; text-align: center; position: relative;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.1);
         }
         .gate-seal {
-            width: 44px; height: 44px; border: 2px solid var(--pink); border-radius: 50%; margin: 0 auto 16px;
+            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); border-radius: 12px; margin: 0 auto 24px;
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Source Serif 4', serif; color: var(--pink); font-size: 1.05rem;
+            font-family: 'Space Grotesk', sans-serif; color: #000; font-size: 1.2rem; font-weight: 700;
         }
-        .gate-card h2 { font-family: 'Source Serif 4', serif; font-size: 1.3rem; margin: 0 0 8px; }
-        .gate-card .gate-copy { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 20px; line-height: 1.5; }
+        .gate-card h2 { font-family: 'Newsreader', serif; font-size: 1.8rem; margin: 0 0 12px; font-weight: 400; }
+        .gate-card .gate-copy { color: var(--text-muted); font-size: 0.95rem; margin: 0 0 24px; line-height: 1.5; }
         input#gate-email {
-            width: 100%; background: #14100c; border: 1px solid var(--surface-border); border-radius: 8px;
-            color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem;
-            padding: 12px 14px; outline: none; margin-bottom: 12px;
+            width: 100%; background: var(--bg); border: 1px solid var(--surface-border); border-radius: 8px;
+            color: var(--text); font-family: 'Inter', sans-serif; font-size: 1rem;
+            padding: 14px 16px; outline: none; margin-bottom: 12px; transition: border-color 0.2s;
         }
-        input#gate-email:focus-visible { border-color: var(--pink); }
+        input#gate-email::placeholder { color: #444; }
+        input#gate-email:focus-visible { border-color: var(--accent-1); }
         .gate-close {
-            position: absolute; top: 14px; right: 16px; background: none; border: none;
-            color: var(--text-muted); font-size: 1.2rem; cursor: pointer; line-height: 1;
+            position: absolute; top: 16px; right: 16px; background: none; border: none;
+            color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1;
         }
-        .gate-close:hover { color: var(--text); }
 
-        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
         @media (max-width: 480px) {
-            .doc { padding: 26px 22px; }
-            .card { padding: 22px; }
+            .doc { padding: 32px 24px; }
+            .card { padding: 24px; }
+            .gate-card { padding: 32px 24px; }
         }
     </style>
 </head>
 <body>
     <nav class="topnav">
         <div class="wrap">
-            <div class="wordmark">Client<span>Brief</span> AI</div>
+            <div class="wordmark">
+                <div class="logo-dot"></div>
+                Client<span>Brief</span> AI
+            </div>
             <ul class="nav-links">
                 <li><a href="#how">How it Works</a></li>
-                <li><a href="#why">Why it Works</a></li>
+                <li><a href="#why">The Edge</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
             <a href="#tool" class="btn-small">Draft a Brief</a>
@@ -414,32 +498,28 @@ async def root():
 
     <header class="hero">
         <div class="wrap">
-            <div class="hero-copy">
-                <p class="eyebrow">For marketing &amp; creative agencies</p>
-                <h1>Every client ramble gets a job number.</h1>
-                <p class="lede">Paste in the notes — however messy. Get back a five-section brief, client-ready, in under a minute. The kind of thing an account lead would actually send with their name on it.</p>
-                <div class="hero-ctas">
-                    <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
-                    <a href="#how" class="link-muted">See how it works ↓</a>
-                </div>
+            <p class="eyebrow">The Strategist's Edge</p>
+            <h1>Turn Client Chaos into <span class="highlight">Billable Strategy</span> in 60 Seconds.</h1>
+            <p class="lede">Stop wrangling messy notes into formatting. Paste the rambling email, and get back a comprehensive, strategically sound brief complete with KPIs, timelines, and inferred insights. It's like having a Senior Strategist on call.</p>
+            <div class="hero-ctas">
+                <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
+                <a href="#why" class="link-muted">See the strategic edge ↓</a>
             </div>
+            
             <div class="hero-visual">
-                <div class="demo">
-                    <div class="demo-panel raw">
-                        <div class="demo-label">As it came in</div>
-                        <p>need smth for the product launch</p>
-                        <p>social + landing page probably?</p>
-                        <p>budget is tight rn</p>
-                        <p>no purple anywhere lol</p>
+                <div class="ui-mockup">
+                    <div class="dot-row">
+                        <div class="dot" style="background:#ff5f56"></div>
+                        <div class="dot" style="background:#ffbd2e"></div>
+                        <div class="dot" style="background:#27c93f"></div>
                     </div>
-                    <div class="demo-arrow">→</div>
-                    <div class="demo-panel filed">
-                        <div class="demo-label">Job No. 4471</div>
-                        <h4>1. Project Overview</h4>
-                        <p>A go-to-market push ahead of the client's...</p>
-                        <h4>2. Business Goals</h4>
-                        <p>Drive awareness and early sign-ups for...</p>
-                    </div>
+                    <div class="line med"></div>
+                    <div class="line short"></div>
+                    <div class="line" style="margin-top:20px"></div>
+                    <div class="line med"></div>
+                    <div class="line short"></div>
+                    <div class="line accent" style="margin-top:20px"></div>
+                    <div class="line"></div>
                 </div>
             </div>
         </div>
@@ -448,111 +528,80 @@ async def root():
     <section class="section" id="how">
         <div class="wrap">
             <div class="section-intro">
-                <p class="eyebrow">How it works</p>
-                <h2>From client ramble to numbered brief.</h2>
+                <h2>From brain-dump to boardroom-ready.</h2>
+                <p>Three steps to a brief that actually moves the project forward.</p>
             </div>
             <div class="steps">
                 <div class="step">
-                    <div class="step-no">01</div>
-                    <h3>Paste the mess</h3>
-                    <p>An email thread, call notes, a three-word text — however it actually arrived.</p>
+                    <span class="step-no">01 / INPUT</span>
+                    <h3>Paste the Chaos</h3>
+                    <p>An email thread, a rushed Slack message, or a messy call transcript. However it arrived, just paste it in.</p>
                 </div>
                 <div class="step">
-                    <div class="step-no">02</div>
-                    <h3>It gets a number and a shape</h3>
-                    <p>Five sections fill in — Overview, Goals, Audience, Scope, Deliverables — with a sensible call made wherever the client left a gap.</p>
+                    <span class="step-no">02 / STRATEGY</span>
+                    <h3>AI Fills the Gaps</h3>
+                    <p>The engine generates a 7-section brief, logically inferring target audience, suggesting KPIs, and projecting a timeline.</p>
                 </div>
                 <div class="step">
-                    <div class="step-no">03</div>
-                    <h3>Send it as your own</h3>
-                    <p>Copy it into the proposal, the kickoff deck, or wherever it needs to go next.</p>
+                    <span class="step-no">03 / DELIVER</span>
+                    <h3>Send with Confidence</h3>
+                    <p>Copy the pristine, professionally formatted document straight into your proposal, deck, or project management tool.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section why" id="why">
+    <section class="section" id="why">
         <div class="wrap">
             <div class="section-intro">
-                <p class="eyebrow">Why it works</p>
-                <h2>Built for the brief nobody wants to write.</h2>
+                <h2>The Factor That Makes You Prefer It.</h2>
+                <p>Anyone can format text. We strategize it.</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
-                    <h3>Fills gaps like a strategist</h3>
-                    <p>Clients never hand over a complete brief. This makes a reasonable call instead of leaving a field blank.</p>
+                    <h3>Strategic Assumptions</h3>
+                    <p>Clients never give you everything. Our AI explicitly lists the strategic gaps it filled, so you know exactly what to validate before the kickoff.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>Reads any kind of mess</h3>
-                    <p>Long email chains, three-word texts, a call transcript — the input doesn't need to be tidy.</p>
+                    <h3>Projected KPIs & Metrics</h3>
+                    <p>A brief isn't a brief without success metrics. The tool automatically suggests relevant KPIs based on the inferred business goals.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>Sounds like an account lead</h3>
-                    <p>Formal, agency-ready language — nothing that reads like a chatbot wrote it.</p>
+                    <h3>Suggested Timelines</h3>
+                    <p>Stop guessing how long things will take. The AI drafts a logical, phased timeline based on the scope of work requested.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>Numbers every brief</h3>
-                    <p>Each one gets a job number and a date, so nothing gets lost across a growing client list.</p>
+                    <h3>Elite Agency Tone</h3>
+                    <p>Reads like it was written by a Senior Account Director. Confident, formal, and completely free of chatbot clichés.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section tool" id="tool">
+    <section class="section tool" id="tool" style="background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
         <div class="wrap">
             <div class="section-intro">
-                <p class="eyebrow">New job</p>
-                <h2>Give this one a number.</h2>
+                <p class="eyebrow">The Generator</p>
+                <h2>Give this one a job number.</h2>
             </div>
             <div class="tool-inner">
                 <div class="card">
-                    <label class="field-label" for="notes-input">Raw client notes</label>
+                    <label class="field-label" for="notes-input">Raw Client Notes / Ramble</label>
                     <textarea id="notes-input" placeholder="e.g. hey can u whip up smth for the launch, need social + a landing page, budget is tight, oh and my sister said purple is unlucky so no purple..."></textarea>
                     <div class="error-text" id="notes-error"></div>
-                    <button class="primary" id="draft-btn" type="button">Draft the Brief</button>
+                    <button class="btn-primary-lg primary" id="draft-btn" type="button" style="margin-top: 20px; width: 100%;">Generate Strategic Brief</button>
                 </div>
 
                 <div class="doc-wrap" id="result-wrap">
-                    <div class="doc-stack">
-                        <div class="doc">
-                            <div class="doc-letterhead">
-                                <span id="doc-ref">JOB NO. 0000</span>
-                                <span id="doc-date">DATE: —</span>
-                                <span class="status-tag">STATUS: PROOF</span>
-                            </div>
-                            <div id="result-body"></div>
-                            <div class="copy-legend">
-                                <span><span class="dot dot-cream"></span>Client copy</span>
-                                <span><span class="dot dot-gold"></span>File copy</span>
-                                <span><span class="dot dot-pink"></span>Internal copy</span>
-                            </div>
+                    <div class="doc">
+                        <div class="doc-letterhead">
+                            <span id="doc-ref">JOB NO. 0000</span>
+                            <span id="doc-date">DATE: —</span>
+                            <span class="status-tag">STATUS: DRAFT</span>
                         </div>
+                        <div id="result-body"></div>
                     </div>
-                    <button class="copy-link" id="copy-btn" type="button">Copy brief</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section routing">
-        <div class="wrap">
-            <div class="section-intro">
-                <p class="eyebrow">Already moving through agencies</p>
-                <h2>Signed off by the people who'd actually use it.</h2>
-            </div>
-            <!-- Placeholder sign-offs — swap in real quotes before launch -->
-            <div class="routing-grid">
-                <div class="routing-stub">
-                    <div class="role">Accounts</div>
-                    <p>"I stopped dreading the intake call. I paste my notes in on the drive home and it's basically done."</p>
-                </div>
-                <div class="routing-stub">
-                    <div class="role">Creative</div>
-                    <p>"Clients can't tell the difference between this and something I spent an hour formatting myself."</p>
-                </div>
-                <div class="routing-stub">
-                    <div class="role">Traffic</div>
-                    <p>"Every job used to sit blank for a day before anyone touched it. Now it has a shape before lunch."</p>
+                    <button class="copy-link" id="copy-btn" type="button">Copy Brief to Clipboard</button>
                 </div>
             </div>
         </div>
@@ -561,25 +610,24 @@ async def root():
     <section class="section" id="faq">
         <div class="wrap">
             <div class="section-intro">
-                <p class="eyebrow">Questions, answered</p>
-                <h2>Before you start a job.</h2>
+                <h2>Questions, answered.</h2>
             </div>
             <div class="faq-list">
                 <details class="faq-item">
                     <summary>Does this replace a strategist?</summary>
-                    <p class="faq-answer">No — think of it as a strong first draft. It gets you from a blank page to a structured brief in under a minute; you still shape the final version.</p>
+                    <p class="faq-answer">No — think of it as a 10x multiplier. It gets you from a blank page to a 90% finished, strategically structured brief in under a minute. You still bring the final human polish and judgment.</p>
                 </details>
                 <details class="faq-item">
-                    <summary>What if the client's notes are a total mess?</summary>
-                    <p class="faq-answer">That's exactly what this is built for. The messier the input, the more useful it is — it makes sensible assumptions wherever the client left a gap, and you can adjust those afterward.</p>
+                    <summary>How does it handle completely chaotic notes?</summary>
+                    <p class="faq-answer">That's its specialty. The AI parses the intent behind the mess, structures it logically, and—crucially—includes a "Strategic Assumptions" section so you can see exactly what it inferred from the chaos.</p>
                 </details>
                 <details class="faq-item">
-                    <summary>Is my client's information stored anywhere?</summary>
-                    <p class="faq-answer">Yes — each brief is saved along with the notes that generated it, so you can find it again later. Nothing is sent to your client automatically.</p>
+                    <summary>Is my client's information stored?</summary>
+                    <p class="faq-answer">Yes, securely. Each brief is saved along with the notes that generated it so you can reference it later. Nothing is ever sent directly to your client without your explicit action.</p>
                 </details>
                 <details class="faq-item">
                     <summary>Can I edit the brief after it's generated?</summary>
-                    <p class="faq-answer">Always. Copy it out and edit freely — it's meant to save you the blank page, not replace your judgment.</p>
+                    <p class="faq-answer">Always. We provide a one-click copy to clipboard. Paste it into Google Docs, Notion, or Word and make it entirely your own.</p>
                 </details>
             </div>
         </div>
@@ -587,10 +635,13 @@ async def root():
 
     <footer class="site-footer">
         <div class="wrap">
-            <div class="wordmark">Client<span>Brief</span> AI</div>
-            <p class="foot-tagline">Paste the rambling client email. Get back a brief you could send with your name on it.</p>
+            <div class="wordmark">
+                <div class="logo-dot"></div>
+                Client<span>Brief</span> AI
+            </div>
+            <p class="foot-tagline">Stop formatting text. Start delivering strategy. Built for agencies who value billable hours over busywork.</p>
             <a href="#tool" class="btn-primary-lg">Draft a Brief — Free</a>
-            <p class="small">© 2026 ClientBrief AI. Built for agencies who'd rather bill hours than write briefs.</p>
+            <p class="small">© 2026 ClientBrief AI. All rights reserved.</p>
         </div>
     </footer>
 
@@ -598,11 +649,11 @@ async def root():
         <div class="gate-card">
             <button class="gate-close" id="gate-close" type="button" aria-label="Close">×</button>
             <div class="gate-seal">CB</div>
-            <h2>One more thing</h2>
-            <p class="gate-copy">Drop your email and we'll hand over the finished brief. No spam — just briefs.</p>
+            <h2>Unlock the Strategy</h2>
+            <p class="gate-copy">Drop your email to generate your first strategic brief. No spam—just smarter workflows.</p>
             <input type="email" id="gate-email" placeholder="you@agency.com" aria-label="Email address">
             <div class="error-text" id="gate-error"></div>
-            <button class="primary" id="gate-submit" type="button">Get My Brief</button>
+            <button class="btn-primary-lg" id="gate-submit" type="button" style="width: 100%;">Get My Brief</button>
         </div>
     </div>
 
@@ -642,7 +693,7 @@ async def root():
             const resultWrap = document.getElementById('result-wrap');
             const btn = document.getElementById('draft-btn');
             btn.disabled = true;
-            btn.textContent = 'Drafting your brief…';
+            btn.textContent = 'Strategizing...';
             resultWrap.classList.remove('visible');
 
             try {
@@ -661,7 +712,7 @@ async def root():
                 resultWrap.classList.add('visible');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Draft the Brief';
+                btn.textContent = 'Generate Strategic Brief';
             }
         }
 
@@ -717,8 +768,8 @@ async def root():
             try {
                 await navigator.clipboard.writeText(text);
                 const original = btn.textContent;
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = original; }, 1500);
+                btn.textContent = 'Copied! Paste it anywhere.';
+                setTimeout(function () { btn.textContent = original; }, 2000);
             } catch (e) {
                 alert('Could not copy automatically — select the text and copy manually.');
             }
