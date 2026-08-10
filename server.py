@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import dns.resolver
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse, HTMLResponse
@@ -25,28 +26,38 @@ _EMAIL_RE = re.compile(
     r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
 )
 
-def normalize_email(email: str | None) -> str | None:
-    """Require a full address (local@domain.tld), not a bare domain like gmail.com."""
+# Block free email providers and known disposable email domains
+BLOCKED_DOMAINS = {
+    "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", 
+    "aol.com", "icloud.com", "protonmail.com", "zoho.com", "msn.com",
+    "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
+    "yopmail.com", "trashmail.com", "getnada.com"
+}
+
+def validate_work_email(email: str) -> tuple[bool, str]:
+    """Validates format, blocks free providers, and checks MX records."""
     if not email:
-        return None
-    candidate = email.strip()
-    if not candidate or " " in candidate:
-        return None
-    if candidate.count("@") != 1:
-        return None
-    local, _, domain = candidate.partition("@")
-    if not local or not domain or "." not in domain:
-        return None
-    if local.startswith(".") or local.endswith("."):
-        return None
-    if domain.startswith(".") or domain.endswith("."):
-        return None
-    tld = domain.rsplit(".", 1)[-1]
-    if len(tld) < 2:
-        return None
+        return False, "Email is required."
+    
+    candidate = email.strip().lower()
     if not _EMAIL_RE.fullmatch(candidate):
-        return None
-    return candidate
+        return False, "Invalid email format."
+    
+    domain = candidate.split("@")[1]
+    
+    if domain in BLOCKED_DOMAINS:
+        return False, "Please use your work email. Free providers (Gmail, Yahoo, etc.) are not accepted."
+    
+    # Check if the domain actually exists and can receive mail (MX Record)
+    try:
+        dns.resolver.resolve(domain, 'MX')
+        return True, "Valid"
+    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.exception.Timeout):
+        return False, "This email domain does not exist. Please provide a valid work email."
+    except Exception:
+        # If DNS server fails temporarily, we let it pass to not block real users
+        return True, "Valid"
+
 
 def call_groq(system_msg: str, user_msg: str, max_tokens: int = 200) -> str:
     headers = {
@@ -73,14 +84,21 @@ def call_groq(system_msg: str, user_msg: str, max_tokens: int = 200) -> str:
         .strip()
     )
 
+
 @app.get("/generate-brief")
 def generate_brief(
     notes: str = Query(..., description="Rough, unstructured notes from a client"),
-    email: str | None = Query(None, description="Email captured by the frontend's email gate"),
+    email: str = Query(..., description="Work email captured by the frontend"),
 ):
     if not GROQ_API_KEY:
         return JSONResponse(status_code=500, content={"error": "GROQ_API_KEY not set in environment."})
 
+    # 1. Validate the email strictly
+    is_valid, error_msg = validate_work_email(email)
+    if not is_valid:
+        return JSONResponse(status_code=400, content={"error": error_msg})
+
+    # 2. Call AI
     try:
         plan = call_groq(
             system_msg=(
@@ -102,16 +120,15 @@ def generate_brief(
     except RuntimeError as e:
         return JSONResponse(status_code=502, content={"error": str(e)})
 
+    # 3. Save to Database
     try:
-        insert_data = {"notes": notes, "brief": plan}
-        stored_email = normalize_email(email)
-        if stored_email:
-            insert_data["email"] = stored_email
+        insert_data = {"notes": notes, "brief": plan, "email": email.strip().lower()}
         supabase.table("b2b_briefs").insert(insert_data).execute()
     except Exception as e:
         print(f"Database Error: {e}")
 
     return {"plan": plan}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -153,6 +170,7 @@ async def root():
             font-size: 16px;
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
         }
         body::before {
             content: '';
@@ -205,11 +223,11 @@ async def root():
             box-shadow: 0 8px 24px var(--accent-glow);
         }
 
-        .hero { padding: 48px 0 72px; }
+        .hero { padding: 80px 0 72px; }
         .hero-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 48px;
+            gap: 64px;
             align-items: center;
         }
         .eyebrow {
@@ -221,7 +239,7 @@ async def root():
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .eyebrow::before {
             content: '';
@@ -231,55 +249,147 @@ async def root():
         }
         .hero h1 {
             font-family: 'Instrument Serif', Georgia, serif;
-            font-size: clamp(2.4rem, 5vw, 3.5rem);
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
             line-height: 1.05;
             font-weight: 400;
             margin-bottom: 20px;
             letter-spacing: -0.02em;
         }
+        .hero h1 em { color: var(--accent); font-style: italic; }
         .hero p {
             color: var(--muted-on-dark);
             font-size: 1.1rem;
             margin-bottom: 32px;
+            max-width: 480px;
+        }
+
+        .input-card {
+            background: var(--bg-soft);
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 16px;
-            background: var(--bg-soft);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid var(--line);
+        }
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ink-on-dark);
+            margin-bottom: -8px;
         }
         .input-group input, .input-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
             border: 1px solid var(--line-light);
             background: var(--surface-2);
             color: var(--ink);
             font-family: inherit;
             font-size: 1rem;
+            transition: border-color 0.2s;
         }
-        .input-group button {
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .input-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+        .generate-btn {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 14px;
+            padding: 16px;
             border-radius: 8px;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 8px;
         }
-        .input-group button:hover { background: #d14c3d; }
+        .generate-btn:hover { background: #d14c3d; }
+        .generate-btn:active { transform: scale(0.98); }
+        .generate-btn:disabled { background: #555; cursor: not-allowed; }
+
+        .output-container {
+            margin-top: 48px;
+            display: none;
+        }
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .output-header h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--line);
+            color: var(--muted-on-dark);
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
         #output {
-            margin-top: 24px;
             white-space: pre-wrap;
             background: var(--bg-soft);
-            padding: 24px;
+            padding: 32px;
             border-radius: 16px;
             border: 1px solid var(--line);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.7;
+            color: var(--ink-on-dark);
+        }
+        #errorBox {
             display: none;
+            background: rgba(232, 93, 76, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            border-top: 1px solid var(--line);
+            margin-top: 80px;
+            padding: 32px 0;
+            text-align: center;
+            color: var(--muted-on-dark);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+            .site-bar nav { display: none; }
         }
     </style>
 </head>
@@ -289,54 +399,100 @@ async def root():
             <a href="/" class="logo">ClientBrief <span>AI</span></a>
             <nav>
                 <a href="#how-it-works">How it works</a>
-                <a href="#pricing">Pricing</a>
+                <a href="#generator">Try it</a>
             </nav>
-            <a href="#generator" class="nav-cta">Try it free</a>
+            <a href="#generator" class="nav-cta">Generate Brief</a>
         </div>
     </header>
 
     <section class="hero" id="generator">
         <div class="wrap">
-            <div class="eyebrow">For Account & Project Leads</div>
-            <h1>Turn messy client intake into a send-ready project brief.</h1>
-            <p>Paste your rough notes below. We'll structure them into a professional agency brief instantly.</p>
-            
-            <div class="input-group">
-                <input type="email" id="email" placeholder="Your work email (required)">
-                <textarea id="notes" rows="5" placeholder="e.g., Client wants a new shopify store, sell skateboards, target gen z, need it by christmas, budget is tight..."></textarea>
-                <button onclick="generateBrief()">Generate Brief</button>
+            <div class="hero-grid">
+                <div>
+                    <div class="eyebrow">For Agency Account Leads</div>
+                    <h1>Turn messy client intake into a <em>send-ready</em> project brief.</h1>
+                    <p>Paste your rough notes from the discovery call. We'll structure them into a professional, 7-point agency brief instantly. No more scope creep from misaligned notes.</p>
+                </div>
+                
+                <div class="input-card">
+                    <div id="errorBox"></div>
+                    <div class="input-group">
+                        <label for="email">Work Email (No Gmail/Yahoo)</label>
+                        <input type="email" id="email" placeholder="you@agency.com">
+                        
+                        <label for="notes">Client Discovery Notes</label>
+                        <textarea id="notes" placeholder="e.g., Client wants a new Shopify store. Sell skateboards. Target gen-z. Needs to be done by christmas. Budget is around 10k. They liked the typography on Thrasher's site."></textarea>
+                        
+                        <button class="generate-btn" id="generateBtn" onclick="generateBrief()">Generate Brief</button>
+                    </div>
+                </div>
             </div>
-            
-            <div id="output"></div>
+
+            <div class="output-container" id="outputContainer">
+                <div class="output-header">
+                    <h3>Generated Project Brief</h3>
+                    <button class="copy-btn" onclick="copyOutput()">Copy Text</button>
+                </div>
+                <div id="output"></div>
+            </div>
         </div>
     </section>
+
+    <footer>
+        <div class="wrap">
+            Built with FastAPI, Supabase, and Groq AI.
+        </div>
+    </footer>
 
     <script>
         async function generateBrief() {
             const notes = document.getElementById('notes').value;
             const email = document.getElementById('email').value;
             const outputDiv = document.getElementById('output');
+            const outputContainer = document.getElementById('outputContainer');
+            const errorBox = document.getElementById('errorBox');
+            const btn = document.getElementById('generateBtn');
             
+            errorBox.style.display = 'none';
+            errorBox.textContent = '';
+
             if (!notes || !email) {
-                alert("Please enter both your email and client notes.");
+                errorBox.textContent = "Please enter both your email and client notes.";
+                errorBox.style.display = 'block';
                 return;
             }
 
-            outputDiv.style.display = 'block';
-            outputDiv.textContent = "Generating brief...";
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+            outputContainer.style.display = 'block';
+            outputDiv.textContent = "Analyzing notes and structuring brief...";
 
             try {
                 const response = await fetch(`/generate-brief?notes=${encodeURIComponent(notes)}&email=${encodeURIComponent(email)}`);
                 const data = await response.json();
                 
                 if (data.error) {
-                    outputDiv.textContent = "Error: " + data.error;
+                    outputContainer.style.display = 'none';
+                    errorBox.textContent = data.error;
+                    errorBox.style.display = 'block';
                 } else {
                     outputDiv.textContent = data.plan;
                 }
             } catch (err) {
-                outputDiv.textContent = "Failed to connect to the server.";
+                outputDiv.textContent = "Failed to connect to the server. Please try again.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Generate Brief';
             }
+        }
+
+        function copyOutput() {
+            const text = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => { btn.innerText = 'Copy Text'; }, 2000);
+            });
         }
     </script>
 </body>
