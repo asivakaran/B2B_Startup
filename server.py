@@ -92,12 +92,11 @@ def generate_brief(
     try:
         plan = call_groq(
             system_msg=(
-                "You are a Senior Account Manager at a boutique creative agency. Take the "
-                "user's rough, messy notes from a client and transform them into a clear, "
-                "professional Client Brief an account director can send to production. Include: "
+                "Write a professional client project brief from rough intake notes, in the tone "
+                "of an experienced agency account lead. Include: "
                 "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
                 "Work, 5. Deliverables, 6. Assumptions & Open Questions, 7. Suggested Timeline. "
-                "Fill gaps with sensible assumptions and flag them explicitly. "
+                "Fill gaps with sensible assumptions and list them under section 6. "
                 "CRITICAL FORMATTING: Do NOT use Markdown (no **, no *, no #). Plain text only. "
                 "Use ALL-CAPS for section headers."
             ),
@@ -130,156 +129,331 @@ async def root():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ClientBrief — Structured briefs for agency account teams</title>
+    <title>ClientBrief AI — Project briefs for marketing &amp; creative agencies</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="For boutique creative, performance, and dev shops: turn vague client intake into a scoped brief before scope creep eats your margin.">
-    <meta name="theme-color" content="#EDE8DF">
+    <meta name="description" content="Turn messy client intake into a scoped, send-ready project brief. Built for account teams at creative, performance, and dev agencies.">
+    <meta name="theme-color" content="#0F1419">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #EDE8DF;
-            --paper: #FAF7F2;
-            --ink: #1C2430;
-            --muted: #5C6570;
-            --line: #C9C0B4;
-            --accent: #8B3A2F;
-            --accent-soft: #E8D4CF;
-            --error: #A12828;
+            --bg: #0F1419;
+            --bg-soft: #161D26;
+            --surface: #F4F0E8;
+            --surface-2: #FFFCF7;
+            --ink: #0F1419;
+            --ink-on-dark: #F4F0E8;
+            --muted: #6B7280;
+            --muted-on-dark: #9CA3AF;
+            --line: rgba(244, 240, 232, 0.12);
+            --line-light: #D4CEC4;
+            --accent: #E85D4C;
+            --accent-2: #3D8B7A;
+            --accent-glow: rgba(232, 93, 76, 0.35);
+            --error: #E85D4C;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
             background: var(--bg);
-            color: var(--ink);
-            font-family: 'Source Sans 3', system-ui, sans-serif;
-            font-size: 17px;
+            color: var(--ink-on-dark);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 16px;
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
         }
-        .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% -10%, rgba(232, 93, 76, 0.15), transparent 50%),
+                radial-gradient(ellipse 60% 40% at 90% 10%, rgba(61, 139, 122, 0.12), transparent 45%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
         a { color: inherit; text-decoration: none; }
-        section[id] { scroll-margin-top: 72px; }
+        section[id] { scroll-margin-top: 80px; }
 
         .site-bar {
-            border-bottom: 1px solid var(--line);
-            background: rgba(237, 232, 223, 0.92);
-            backdrop-filter: blur(8px);
             position: sticky;
             top: 0;
-            z-index: 20;
+            z-index: 40;
+            border-bottom: 1px solid var(--line);
+            background: rgba(15, 20, 25, 0.88);
+            backdrop-filter: blur(14px);
         }
         .site-bar .wrap {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding-top: 18px;
-            padding-bottom: 18px;
-            flex-wrap: wrap;
+            gap: 20px;
+            height: 68px;
         }
         .logo {
-            font-family: 'Libre Baskerville', Georgia, serif;
-            font-size: 1.15rem;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.35rem;
             letter-spacing: -0.02em;
         }
-        .logo small {
-            display: block;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.72rem;
+        .logo span { color: var(--accent); font-style: italic; }
+        .site-bar nav { display: flex; gap: 28px; font-size: 0.9rem; color: var(--muted-on-dark); }
+        .site-bar nav a:hover { color: var(--ink-on-dark); }
+        .nav-cta {
+            background: var(--surface);
+            color: var(--ink);
             font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-        .site-bar nav { display: flex; gap: 22px; font-size: 0.92rem; color: var(--muted); }
-        .site-bar nav a:hover { color: var(--ink); }
-        .pill-link {
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid var(--ink);
-            padding: 8px 14px;
+            font-size: 0.88rem;
+            padding: 10px 18px;
             border-radius: 999px;
-            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .pill-link:hover { background: var(--ink); color: var(--paper); }
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
 
-        .hero { padding: 56px 0 40px; }
+        .hero { padding: 48px 0 72px; }
         .hero-grid {
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 40px;
-            align-items: start;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
         }
-        .kicker {
-            font-size: 0.8rem;
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
             font-weight: 600;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+        }
+        .eyebrow::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
         }
         .hero h1 {
-            font-family: 'Libre Baskerville', Georgia, serif;
-            font-size: clamp(2rem, 4.5vw, 2.85rem);
-            line-height: 1.15;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(2.4rem, 5vw, 3.5rem);
+            line-height: 1.05;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+        .hero h1 em { font-style: italic; color: var(--surface); }
+        .hero .lede {
+            color: var(--muted-on-dark);
+            font-size: 1.08rem;
+            max-width: 28rem;
+            margin-bottom: 28px;
+        }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 24px; }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
             font-weight: 700;
+            font-size: 0.95rem;
+            padding: 14px 26px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.2s, transform 0.2s;
+        }
+        .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .btn-ghost {
+            color: var(--muted-on-dark);
+            font-size: 0.92rem;
+            border-bottom: 1px solid var(--muted-on-dark);
+            padding-bottom: 2px;
+        }
+        .btn-ghost:hover { color: var(--surface); border-color: var(--surface); }
+        .trust-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.82rem;
+            color: var(--muted-on-dark);
+        }
+        .trust-row span { display: flex; align-items: center; gap: 6px; }
+        .trust-row span::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-2);
+        }
+
+        .preview-card {
+            background: var(--surface-2);
+            color: var(--ink);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.06);
+            transform: rotate(1deg);
+            transition: transform 0.4s ease;
+        }
+        .preview-card:hover { transform: rotate(0deg) translateY(-4px); }
+        .preview-bar {
+            background: var(--ink);
+            color: var(--surface);
+            font-size: 0.72rem;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            letter-spacing: 0.04em;
+        }
+        .preview-body { padding: 22px 20px 24px; }
+        .preview-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 18px;
         }
-        .hero h1 em { font-style: italic; font-weight: 400; }
-        .hero .lede { color: var(--muted); max-width: 34rem; margin-bottom: 22px; }
-        .hero-note {
-            font-size: 0.9rem;
+        .preview-stat {
+            background: var(--surface);
+            border: 1px solid var(--line-light);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .preview-stat label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
             color: var(--muted);
-            border-left: 3px solid var(--accent);
-            padding-left: 14px;
-            max-width: 28rem;
+            display: block;
+            margin-bottom: 4px;
         }
-        .for-whom {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            padding: 22px 20px;
-        }
-        .for-whom h2 {
-            font-family: 'Libre Baskerville', serif;
+        .preview-stat strong { font-size: 0.95rem; }
+        .preview-snippet {
+            font-family: 'Instrument Serif', Georgia, serif;
             font-size: 1.05rem;
-            margin-bottom: 10px;
+            line-height: 1.45;
+            color: #3d3d3d;
         }
-        .for-whom ul { list-style: none; font-size: 0.92rem; color: var(--muted); }
-        .for-whom li { padding: 6px 0; border-top: 1px solid var(--line); }
-        .for-whom li:first-child { border-top: none; padding-top: 0; }
+        .preview-snippet cite {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.72rem;
+            font-style: normal;
+            color: var(--muted);
+            margin-top: 10px;
+        }
 
-        .strip {
-            border-top: 1px solid var(--line);
-            border-bottom: 1px solid var(--line);
-            padding: 28px 0;
-            background: var(--paper);
+        .section-light {
+            background: var(--surface);
+            color: var(--ink);
+            padding: 72px 0;
+            position: relative;
+            z-index: 1;
         }
-        .strip .wrap {
+        .section-head {
+            text-align: center;
+            max-width: 560px;
+            margin: 0 auto 48px;
+        }
+        .section-head h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(1.85rem, 4vw, 2.6rem);
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+        .section-head p { color: var(--muted); font-size: 1.02rem; }
+
+        .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            font-size: 0.92rem;
+            gap: 24px;
         }
-        .strip strong { display: block; font-size: 1rem; margin-bottom: 4px; color: var(--ink); }
+        .step {
+            border: 1px solid var(--line-light);
+            border-radius: 12px;
+            padding: 28px 22px;
+            background: var(--surface-2);
+        }
+        .step-num {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 14px;
+        }
+        .step h3 { font-size: 1.05rem; margin-bottom: 8px; font-weight: 600; }
+        .step p { color: var(--muted); font-size: 0.92rem; }
 
-        .workspace { padding: 48px 0 64px; }
-        .workspace-head { margin-bottom: 20px; }
-        .workspace-head h2 {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 1.65rem;
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
-        .workspace-head p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+        .benefit {
+            padding: 28px;
+            border-radius: 12px;
+            background: var(--bg-soft);
+            color: var(--ink-on-dark);
+            border: 1px solid var(--line);
+        }
+        .benefit h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.35rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        .benefit p { color: var(--muted-on-dark); font-size: 0.92rem; }
+
+        .workspace {
+            padding: 72px 0 80px;
+            position: relative;
+            z-index: 1;
+        }
+        .workspace .section-head { margin-bottom: 32px; }
+        .workspace .section-head h2 { color: var(--surface); }
+        .workspace .section-head p { color: var(--muted-on-dark); }
+        .tool-shell {
+            background: var(--surface);
+            color: var(--ink);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+        }
+        .tool-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--line-light);
+            background: var(--surface-2);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .tool-tabs span {
+            padding: 14px 20px;
+            color: var(--muted);
+        }
+        .tool-tabs span.active {
+            color: var(--ink);
+            background: var(--surface);
+            box-shadow: inset 0 -2px 0 var(--accent);
+        }
         .desk {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            border: 1px solid var(--line);
-            background: var(--paper);
-            min-height: 520px;
+            min-height: 480px;
         }
-        .desk-in, .desk-out { padding: 22px; display: flex; flex-direction: column; }
-        .desk-out { border-left: 1px solid var(--line); background: #FFFCF8; }
+        .desk-in, .desk-out {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .desk-out {
+            background: var(--surface-2);
+            border-left: 1px solid var(--line-light);
+        }
         .field-label {
             font-size: 0.72rem;
             font-weight: 700;
@@ -288,36 +462,59 @@ async def root():
             color: var(--muted);
             margin-bottom: 10px;
         }
+        .input-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .chip {
+            background: var(--surface-2);
+            border: 1px solid var(--line-light);
+            font-size: 0.78rem;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--muted);
+        }
+        .chip:hover { border-color: var(--accent); color: var(--ink); }
         textarea#notes-input {
             flex: 1;
-            min-height: 280px;
+            min-height: 240px;
             width: 100%;
-            border: 1px dashed var(--line);
-            background: transparent;
-            padding: 14px;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 1rem;
-            line-height: 1.5;
+            border: 1px solid var(--line-light);
+            border-radius: 10px;
+            background: #fff;
+            padding: 16px;
+            font-family: inherit;
+            font-size: 0.98rem;
+            line-height: 1.55;
             color: var(--ink);
             resize: vertical;
             outline: none;
         }
-        textarea#notes-input:focus { border-color: var(--accent); border-style: solid; }
+        textarea#notes-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .hint { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
         .field-error { color: var(--error); font-size: 0.85rem; min-height: 1.2em; margin-top: 8px; }
         .btn-draft {
             margin-top: 14px;
             width: 100%;
-            background: var(--accent);
-            color: #fff;
+            background: var(--ink);
+            color: var(--surface);
             border: none;
-            padding: 14px 18px;
+            padding: 15px 18px;
             font-family: inherit;
             font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
+            border-radius: 10px;
         }
-        .btn-draft:hover { filter: brightness(1.05); }
-        .btn-draft:disabled { opacity: 0.65; cursor: wait; }
+        .btn-draft:hover { background: var(--accent); }
+        .btn-draft:disabled { opacity: 0.6; cursor: wait; }
 
         .out-meta {
             display: flex;
@@ -327,66 +524,131 @@ async def root():
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--muted);
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--line);
             margin-bottom: 16px;
+        }
+        .status-pill {
+            background: var(--accent-2);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
         }
         .out-placeholder {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             color: var(--muted);
             font-size: 0.92rem;
-            padding: 24px;
+            padding: 32px 16px;
+            border: 1px dashed var(--line-light);
+            border-radius: 10px;
         }
-        #result-body { display: none; }
+        .out-placeholder svg { opacity: 0.35; margin-bottom: 12px; }
+        .out-placeholder p { margin: 0; max-width: 220px; }
+        #result-body { display: none; flex: 1; overflow-y: auto; max-height: 340px; }
         #result-body.visible { display: block; }
         #result-body h3 {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 1.05rem;
-            margin: 18px 0 6px;
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.08rem;
+            margin: 16px 0 6px;
         }
         #result-body h3:first-child { margin-top: 0; }
-        #result-body p { font-size: 0.92rem; color: var(--muted); margin-bottom: 6px; }
+        #result-body p { font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; }
         .btn-copy {
-            margin-top: auto;
+            margin-top: 14px;
             align-self: flex-start;
             background: transparent;
             border: 1px solid var(--ink);
-            padding: 8px 14px;
+            padding: 10px 18px;
             font-size: 0.78rem;
             font-weight: 600;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             cursor: pointer;
+            border-radius: 999px;
             display: none;
         }
         .btn-copy.visible { display: inline-block; }
+        .btn-copy:hover { background: var(--ink); color: var(--surface); }
 
-        .faq { padding: 40px 0 56px; border-top: 1px solid var(--line); }
-        .faq h2 {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 1.4rem;
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .price-card {
+            border: 1px solid var(--line-light);
+            border-radius: 14px;
+            padding: 28px;
+            background: var(--surface-2);
+            position: relative;
+        }
+        .price-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px var(--accent-glow);
+        }
+        .price-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .price-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+        .price-card .sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+        .price-card .amount {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
             margin-bottom: 16px;
         }
+        .price-card ul { list-style: none; font-size: 0.88rem; color: var(--muted); }
+        .price-card li { padding: 6px 0; border-top: 1px solid var(--line-light); }
+        .price-card li:first-child { border-top: none; }
+
+        .faq { padding: 64px 0; background: var(--surface); color: var(--ink); }
+        .faq-list { max-width: 640px; margin: 0 auto; }
         details {
-            border-bottom: 1px solid var(--line);
-            padding: 14px 0;
+            border-bottom: 1px solid var(--line-light);
+            padding: 18px 0;
         }
         summary {
             cursor: pointer;
             font-weight: 600;
             list-style: none;
+            font-size: 1rem;
         }
         summary::-webkit-details-marker { display: none; }
-        details p { color: var(--muted); font-size: 0.92rem; margin-top: 10px; max-width: 40rem; }
+        details p { color: var(--muted); font-size: 0.92rem; margin-top: 10px; line-height: 1.6; }
+
+        .cta-band {
+            padding: 56px 0;
+            text-align: center;
+            background: var(--bg-soft);
+            border-top: 1px solid var(--line);
+        }
+        .cta-band h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
 
         footer {
-            padding: 28px 0 40px;
+            padding: 32px 0 48px;
             font-size: 0.82rem;
-            color: var(--muted);
+            color: var(--muted-on-dark);
+            text-align: center;
             border-top: 1px solid var(--line);
         }
 
@@ -394,7 +656,8 @@ async def root():
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(28, 36, 48, 0.55);
+            background: rgba(15, 20, 25, 0.72);
+            backdrop-filter: blur(6px);
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -402,34 +665,36 @@ async def root():
         }
         .gate-overlay.visible { display: flex; }
         .gate-card {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            max-width: 420px;
+            background: var(--surface);
+            color: var(--ink);
+            border-radius: 14px;
+            max-width: 400px;
             width: 100%;
             padding: 32px 28px;
             position: relative;
-            box-shadow: 0 18px 40px rgba(28, 36, 48, 0.12);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
         }
         .gate-card h2 {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 1.45rem;
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
             margin-bottom: 8px;
         }
         .gate-card p { color: var(--muted); font-size: 0.92rem; margin-bottom: 16px; }
         input#gate-email {
             width: 100%;
-            border: 1px solid var(--line);
+            border: 1px solid var(--line-light);
+            border-radius: 8px;
             padding: 12px 14px;
             font: inherit;
             margin-bottom: 8px;
-            background: #fff;
         }
-        input#gate-email:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+        input#gate-email:focus { outline: 2px solid var(--accent-glow); border-color: var(--accent); }
         input#gate-email.invalid { border-color: var(--error); }
         .gate-close {
             position: absolute;
-            top: 10px;
-            right: 12px;
+            top: 12px;
+            right: 14px;
             border: none;
             background: none;
             font-size: 1.4rem;
@@ -439,95 +704,196 @@ async def root():
         .btn-gate {
             width: 100%;
             margin-top: 8px;
-            background: var(--ink);
+            background: var(--accent);
             color: #fff;
             border: none;
-            padding: 12px;
+            padding: 13px;
             font: inherit;
             font-weight: 700;
             cursor: pointer;
+            border-radius: 999px;
         }
 
-        @media (max-width: 860px) {
-            .hero-grid, .desk, .strip .wrap { grid-template-columns: 1fr; }
-            .desk-out { border-left: none; border-top: 1px solid var(--line); }
+        @media (max-width: 900px) {
+            .hero-grid, .desk, .steps, .benefits, .pricing-grid, .preview-cols { grid-template-columns: 1fr; }
+            .desk-out { border-left: none; border-top: 1px solid var(--line-light); }
             .site-bar nav { display: none; }
+            .preview-card { transform: none; }
         }
     </style>
 </head>
 <body>
     <header class="site-bar">
         <div class="wrap">
-            <div class="logo">
-                ClientBrief
-                <small>For agency account teams</small>
-            </div>
+            <div class="logo">Client<span>Brief</span> AI</div>
             <nav>
-                <a href="#why">Why</a>
-                <a href="#tool">Try it</a>
+                <a href="#how">How it works</a>
+                <a href="#why">Benefits</a>
+                <a href="#pricing">Pricing</a>
                 <a href="#faq">FAQ</a>
             </nav>
-            <a class="pill-link" href="#tool">Draft a brief</a>
+            <a class="nav-cta" href="#tool">Try it free</a>
         </div>
     </header>
 
     <section class="hero">
         <div class="wrap hero-grid">
             <div>
-                <p class="kicker">Stage 1 · MVP for shops under $1M</p>
-                <h1>Turn a messy client intake into a <em>brief your team can scope.</em></h1>
-                <p class="lede">Account directors at boutique creative, performance, and dev agencies still lose billable hours rewriting vague kickoff notes. ClientBrief structures the ramble—before scope creep and revision loops do the damage.</p>
-                <p class="hero-note">Paste an email thread, Slack dump, or call transcript. You get sections, assumptions called out, and a timeline you can push back on in the next client call.</p>
+                <p class="eyebrow">For marketing &amp; creative agencies</p>
+                <h1>Project briefs from messy client intake—in <em>about a minute.</em></h1>
+                <p class="lede">Paste the kickoff email, Slack thread, or call notes. Get a structured brief with scope, deliverables, open questions, and a timeline you can share internally or polish for the client.</p>
+                <div class="hero-actions">
+                    <a class="btn-primary" href="#tool">Create a brief</a>
+                    <a class="btn-ghost" href="#how">See how it works</a>
+                </div>
+                <div class="trust-row">
+                    <span>No account to start</span>
+                    <span>Copy &amp; paste anywhere</span>
+                    <span>You edit before anything goes out</span>
+                </div>
             </div>
-            <aside class="for-whom" id="why">
-                <h2>Built for teams like yours</h2>
-                <ul>
-                    <li>Creative &amp; brand boutiques (5–25 people)</li>
-                    <li>Performance marketing shops juggling fast turn briefs</li>
-                    <li>Software studios translating non-technical client notes</li>
-                </ul>
-            </aside>
+            <div class="preview-card" aria-hidden="true">
+                <div class="preview-bar">
+                    <span>clientbrief / brief / northwind-q4</span>
+                    <span>DRAFT</span>
+                </div>
+                <div class="preview-body">
+                    <div class="preview-cols">
+                        <div class="preview-stat">
+                            <label>Client</label>
+                            <strong>Northwind Studio</strong>
+                        </div>
+                        <div class="preview-stat">
+                            <label>Timeline</label>
+                            <strong>6 weeks · phased</strong>
+                        </div>
+                    </div>
+                    <p class="preview-snippet">“Scope covers paid social and a launch landing page. Budget still TBD—flagged for follow-up. Display excluded per client note on brand colors…”</p>
+                    <cite>Excerpt · Project overview &amp; scope</cite>
+                </div>
+            </div>
         </div>
     </section>
 
-    <div class="strip">
+    <section class="section-light" id="how">
         <div class="wrap">
-            <div>
-                <strong>Problem we heard</strong>
-                Incomplete intakes → fuzzy scope → unpaid rework.
+            <div class="section-head">
+                <h2>From intake to internal brief in three steps</h2>
+                <p>Same rhythm your account team already uses—without an afternoon lost to formatting.</p>
             </div>
-            <div>
-                <strong>What you get</strong>
-                Seven-part brief with assumptions &amp; open questions listed upfront.
-            </div>
-            <div>
-                <strong>Pricing direction</strong>
-                Self-serve from $49–$99/mo with clear generation caps—not unlimited usage.
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">01</div>
+                    <h3>Paste client notes</h3>
+                    <p>Email forwards, discovery call bullets, or a messy voice-memo transcript. However the client actually talks to you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">02</div>
+                    <h3>Review the draft</h3>
+                    <p>Seven clear sections—goals, audience, scope, deliverables, assumptions, and timeline—ready for your edits.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">03</div>
+                    <h3>Send when you're ready</h3>
+                    <p>Copy into Notion, Google Docs, or your PM tool. Nothing goes to your client until you say so.</p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <section class="workspace" id="tool">
         <div class="wrap">
-            <div class="workspace-head">
-                <h2>Your desk</h2>
-                <p>No login for the demo—just your work email the first time you generate, so we know who's actually in an agency seat.</p>
+            <div class="section-head">
+                <h2>Try it on real notes</h2>
+                <p>Paste below or load a sample. First brief asks for your work email—then you're set.</p>
             </div>
-            <div class="desk">
-                <div class="desk-in">
-                    <label class="field-label" for="notes-input">Raw client notes</label>
-                    <textarea id="notes-input" placeholder="Example: 'Need something for Q4 launch — social, maybe landing page. Budget TBD. Client hates purple. Competitor X just did a rebrand…'"></textarea>
-                    <div class="field-error" id="notes-error"></div>
-                    <button class="btn-draft" id="draft-btn" type="button">Structure this brief</button>
+            <div class="tool-shell">
+                <div class="tool-tabs">
+                    <span class="active">Intake</span>
+                    <span>Brief output</span>
                 </div>
-                <div class="desk-out">
-                    <div class="out-meta">
-                        <span>Job <span id="doc-ref">—</span></span>
-                        <span id="doc-date">Draft</span>
+                <div class="desk">
+                    <div class="desk-in">
+                        <label class="field-label" for="notes-input">Client notes</label>
+                        <div class="input-tools">
+                            <button type="button" class="chip" id="sample-btn">Load sample notes</button>
+                        </div>
+                        <textarea id="notes-input" placeholder="Paste client intake here…"></textarea>
+                        <p class="hint">Tip: Ctrl+Enter (⌘+Enter on Mac) to create brief</p>
+                        <div class="field-error" id="notes-error"></div>
+                        <button class="btn-draft" id="draft-btn" type="button">Create brief</button>
                     </div>
-                    <div class="out-placeholder" id="placeholder-state">Your brief lands here—ready to paste into Notion, Google Docs, or your PM tool.</div>
-                    <div id="result-body"></div>
-                    <button class="btn-copy" id="copy-btn" type="button">Copy to clipboard</button>
+                    <div class="desk-out">
+                        <div class="out-meta">
+                            <span>Brief · <span id="doc-ref">—</span></span>
+                            <span class="status-pill" id="doc-date">Awaiting input</span>
+                        </div>
+                        <div class="out-placeholder" id="placeholder-state">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                            <p id="placeholder-msg">Your formatted brief appears here—ready to copy and tweak.</p>
+                        </div>
+                        <div id="result-body"></div>
+                        <button class="btn-copy" id="copy-btn" type="button">Copy brief</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-light" id="why">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>You're running accounts—not retyping briefs</h2>
+                <p>Built for boutiques and small agencies where the same person sells the work, writes the scope, and still has to deliver.</p>
+            </div>
+            <div class="benefits">
+                <div class="benefit">
+                    <h3>Hours back on every new job</h3>
+                    <p>Skip the blank doc. Start from a structured draft so production and design can estimate sooner.</p>
+                </div>
+                <div class="benefit">
+                    <h3>Scope you can defend</h3>
+                    <p>Assumptions and open questions sit in their own section—so change requests don't sneak in as "small tweaks."</p>
+                </div>
+                <div class="benefit">
+                    <h3>Works how clients actually brief you</h3>
+                    <p>No templates to fill first. Drop in the ramble; get sections that match how your team already writes SOWs.</p>
+                </div>
+                <div class="benefit">
+                    <h3>Not another reporting tool</h3>
+                    <p>Unlike monthly performance reports, this is for <strong>project intake</strong>—before the work starts and scope still moves.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-light" id="pricing" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Simple plans for small teams</h2>
+                <p>Predictable monthly pricing with clear brief limits—no surprise overages.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <h3>Studio</h3>
+                    <p class="sub">Freelancers &amp; micro agencies</p>
+                    <p class="amount">$49<span style="font-size:1rem;font-family:'DM Sans'">/mo</span></p>
+                    <ul>
+                        <li>15 briefs per month</li>
+                        <li>Email &amp; paste intake</li>
+                        <li>Copy to any doc tool</li>
+                    </ul>
+                </div>
+                <div class="price-card featured">
+                    <span class="price-badge">Popular</span>
+                    <h3>Agency</h3>
+                    <p class="sub">Account teams up to ~25 people</p>
+                    <p class="amount">$89<span style="font-size:1rem;font-family:'DM Sans'">/mo</span></p>
+                    <ul>
+                        <li>40 briefs per month</li>
+                        <li>Shared team access (soon)</li>
+                        <li>Priority support</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -535,38 +901,49 @@ async def root():
 
     <section class="faq" id="faq">
         <div class="wrap">
-            <h2>Questions account leads actually ask</h2>
-            <details>
-                <summary>Does this replace my strategist?</summary>
-                <p>No. It gets you from blank doc to a solid first pass in about a minute. You still own tone, pricing, and what goes to the client.</p>
-            </details>
-            <details>
-                <summary>Why ask for my email?</summary>
-                <p>We're validating demand with real agency inboxes—not just someone typing @gmail.com. We need your full address (name@yourshop.com).</p>
-            </details>
-            <details>
-                <summary>What happens to client data?</summary>
-                <p>Notes and generated briefs are stored so you can revisit them. Nothing is emailed to your client automatically.</p>
-            </details>
-            <details>
-                <summary>How will pricing work?</summary>
-                <p>Flat monthly subscription with a fixed number of brief generations per month—designed to keep margins healthy while you're still proving unit economics.</p>
-            </details>
+            <div class="section-head">
+                <h2>Common questions</h2>
+            </div>
+            <div class="faq-list">
+                <details>
+                    <summary>Do I still edit before the client sees it?</summary>
+                    <p>Always. You get a draft to reshape, price, and approve. Nothing is sent on your behalf.</p>
+                </details>
+                <details>
+                    <summary>Why do you ask for my email?</summary>
+                    <p>Once, so we can save your spot and follow up about team plans. Use your full work address (name@company.com).</p>
+                </details>
+                <details>
+                    <summary>What happens to client notes?</summary>
+                    <p>Notes and briefs are stored securely so you can revisit them. Delete requests are honored—contact us anytime.</p>
+                </details>
+                <details>
+                    <summary>How is this different from client reporting software?</summary>
+                    <p>Reporting tools summarize campaign results after the fact. ClientBrief AI is for the <em>front</em> of the job—turning vague intake into a scoped brief before production starts.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-band">
+        <div class="wrap">
+            <h2>Clear the intake backlog on your next new business call</h2>
+            <a class="btn-primary" href="#tool">Create a brief</a>
         </div>
     </section>
 
     <footer>
-        <div class="wrap">© 2026 ClientBrief · Made for agencies that track billable hours seriously.</div>
+        <div class="wrap">© 2026 ClientBrief AI · Built for agencies</div>
     </footer>
 
     <div class="gate-overlay" id="email-gate">
         <div class="gate-card">
             <button class="gate-close" id="gate-close" type="button" aria-label="Close">&times;</button>
-            <h2>One quick thing</h2>
-            <p>Enter your full work email—first name, @, and company domain. We can't use entries like <em>gmail.com</em> or <em>@agency.com</em> alone.</p>
-            <input type="text" id="gate-email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="alex@northwind.studio" aria-label="Work email address">
+            <h2>Almost there</h2>
+            <p>Enter your full work email so we know who’s using the tool (e.g. jordan@youragency.com).</p>
+            <input type="text" id="gate-email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="jordan@youragency.com" aria-label="Work email address">
             <div class="field-error" id="gate-error"></div>
-            <button class="btn-gate" id="gate-submit" type="button">Continue &amp; generate</button>
+            <button class="btn-gate" id="gate-submit" type="button">Continue</button>
         </div>
     </div>
 
@@ -620,8 +997,15 @@ async def root():
             resultBody.classList.add('visible');
             copyBtn.classList.add('visible');
             document.getElementById('doc-ref').textContent = String(Math.floor(1000 + Math.random() * 9000));
-            document.getElementById('doc-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('doc-date').textContent = 'Draft ready';
         }
+
+        const SAMPLE_NOTES = "Hey team — client wants something for Q4 product launch. Social (Meta + maybe TikTok), landing page, they mentioned 'premium but approachable'. Budget not confirmed yet, ballpark 15–20k. No purple (CEO hates it). Competitor Lumina just rebranded — client wants to look distinct. Need first concepts in ~3 weeks if possible.";
+
+        document.getElementById('sample-btn').addEventListener('click', function () {
+            document.getElementById('notes-input').value = SAMPLE_NOTES;
+            document.getElementById('notes-error').textContent = '';
+        });
 
         async function draftBrief(notes, email) {
             const btn = document.getElementById('draft-btn');
@@ -629,27 +1013,43 @@ async def root():
             const placeholder = document.getElementById('placeholder-state');
             const resultBody = document.getElementById('result-body');
             const copyBtn = document.getElementById('copy-btn');
+            const docDate = document.getElementById('doc-date');
             btn.disabled = true;
-            btn.textContent = 'Working…';
+            btn.textContent = 'Building your brief…';
             notesError.textContent = '';
             resultBody.classList.remove('visible');
             copyBtn.classList.remove('visible');
             placeholder.style.display = 'flex';
-            placeholder.textContent = 'Reading the notes and drafting sections…';
+            placeholder.querySelector('p') || (function () {
+                var p = document.createElement('p');
+                placeholder.appendChild(p);
+            })();
+            var phText = placeholder.querySelector('p') || placeholder;
+            if (placeholder.querySelector('p')) {
+                placeholder.querySelector('p').textContent = 'Organizing sections…';
+            } else {
+                placeholder.childNodes.forEach(function (n) {
+                    if (n.nodeType === 3) n.textContent = '';
+                });
+                placeholder.lastChild && placeholder.lastChild.textContent && (placeholder.lastChild.textContent = 'Organizing sections…');
+            }
+            docDate.textContent = 'In progress';
 
             try {
                 let url = '/generate-brief?notes=' + encodeURIComponent(notes);
                 if (email) url += '&email=' + encodeURIComponent(email);
                 const response = await fetch(url);
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Could not generate the brief.');
+                if (!response.ok) throw new Error(data.error || 'Could not create the brief.');
                 renderBrief(data.plan || '');
             } catch (e) {
                 placeholder.style.display = 'flex';
-                placeholder.textContent = e.message || 'Something went wrong. Try again in a moment.';
+                var msg = placeholder.querySelector('p');
+                if (msg) msg.textContent = e.message || 'Something went wrong. Try again.';
+                docDate.textContent = 'Error';
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Structure this brief';
+                btn.textContent = 'Create brief';
             }
         }
 
