@@ -17,7 +17,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # ----------------------
 
-app = FastAPI(title="ClientBrief AI")
+app = FastAPI(title="BriefStudio")
 
 _EMAIL_RE = re.compile(
     r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
@@ -685,7 +685,7 @@ async def root():
 <body>
     <header class="site-bar">
         <div class="wrap">
-            <div class="logo">Client<span>Brief</span> AI</div>
+            <div class="logo">Brief<span>Studio</span></div>
             <nav>
                 <a href="#how">How it works</a>
                 <a href="#why">Benefits</a>
@@ -713,7 +713,7 @@ async def root():
             </div>
             <div class="preview-card" aria-hidden="true">
                 <div class="preview-bar">
-                    <span>clientbrief / brief / northwind-q4</span>
+                    <span>briefstudio / brief / northwind-q4</span>
                     <span>DRAFT</span>
                 </div>
                 <div class="preview-body">
@@ -846,7 +846,7 @@ async def root():
                 </details>
                 <details>
                     <summary>How is this different from client reporting software?</summary>
-                    <p>Reporting tools summarize campaign results after the fact. ClientBrief AI is for the <em>front</em> of the job—turning vague intake into a scoped brief before production starts.</p>
+                    <p>Reporting tools summarize campaign results after the fact. BriefStudio is for the <em>front</em> of the job—turning vague intake into a scoped brief before production starts.</p>
                 </details>
             </div>
         </div>
@@ -860,7 +860,7 @@ async def root():
     </section>
 
     <footer>
-        <div class="wrap">© 2026 ClientBrief AI · Built for agencies</div>
+        <div class="wrap">© 2026 BriefStudio · Built for agencies</div>
     </footer>
 
     <div class="gate-overlay" id="email-gate">
@@ -875,7 +875,7 @@ async def root():
     </div>
 
     <script>
-        const EMAIL_KEY = 'clientbrief_email';
+        const EMAIL_KEY = 'briefstudio_email';
         let pendingNotes = null;
         
         // Frontend blocklist for instant rejection of free emails
