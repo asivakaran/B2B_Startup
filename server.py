@@ -131,7 +131,7 @@ async def root():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ClientBrief AI — Project briefs for marketing &amp; creative agencies</title>
+    <title>BriefStudio — Project briefs for marketing &amp; creative agencies</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Turn messy client intake into a scoped, send-ready project brief. Built for account teams at creative, performance, and dev agencies.">
     <meta name="theme-color" content="#0F1419">
