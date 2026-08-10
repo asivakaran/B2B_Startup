@@ -1,7 +1,6 @@
 import os
 import re
 import requests
-import dns.resolver
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse, HTMLResponse
@@ -31,11 +30,11 @@ BLOCKED_DOMAINS = {
     "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", 
     "aol.com", "icloud.com", "protonmail.com", "zoho.com", "msn.com",
     "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
-    "yopmail.com", "trashmail.com", "getnada.com"
+    "yopmail.com", "trashmail.com", "getnada.com", "googlemail.com", "gmx.com"
 }
 
 def validate_work_email(email: str) -> tuple[bool, str]:
-    """Validates format, blocks free providers, and checks MX records."""
+    """Validates format and blocks free providers."""
     if not email:
         return False, "Email is required."
     
@@ -48,15 +47,7 @@ def validate_work_email(email: str) -> tuple[bool, str]:
     if domain in BLOCKED_DOMAINS:
         return False, "Please use your work email. Free providers (Gmail, Yahoo, etc.) are not accepted."
     
-    # Check if the domain actually exists and can receive mail (MX Record)
-    try:
-        dns.resolver.resolve(domain, 'MX')
-        return True, "Valid"
-    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.exception.Timeout):
-        return False, "This email domain does not exist. Please provide a valid work email."
-    except Exception:
-        # If DNS server fails temporarily, we let it pass to not block real users
-        return True, "Valid"
+    return True, "Valid"
 
 
 def call_groq(system_msg: str, user_msg: str, max_tokens: int = 200) -> str:
