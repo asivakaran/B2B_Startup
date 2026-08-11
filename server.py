@@ -25,16 +25,15 @@ _EMAIL_RE = re.compile(
     r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
 )
 
-# Backend blocklist for free and disposable email providers
+# Backend blocklist for disposable/temporary email providers ONLY
 BLOCKED_DOMAINS = {
-    "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", 
-    "aol.com", "icloud.com", "protonmail.com", "zoho.com", "msn.com",
-    "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
-    "yopmail.com", "trashmail.com", "getnada.com", "googlemail.com", "gmx.com"
+    "mailinator.com", "guerrillamail.com", "10minutemail.com", 
+    "tempmail.com", "yopmail.com", "trashmail.com", "getnada.com",
+    "temp-mail.org", "sharklasers.com", "guerrillamailblock.com"
 }
 
 def validate_work_email(email: str) -> tuple[bool, str]:
-    """Validates format and blocks free providers."""
+    """Validates format and blocks disposable providers."""
     if not email:
         return False, "Email is required."
     
@@ -45,7 +44,7 @@ def validate_work_email(email: str) -> tuple[bool, str]:
     domain = candidate.split("@")[1]
     
     if domain in BLOCKED_DOMAINS:
-        return False, "Please use your work email. Free providers (Gmail, Yahoo, etc.) are not accepted."
+        return False, "Please use a real email. Temporary/disposable emails are not accepted."
     
     return True, "Valid"
 
@@ -764,7 +763,7 @@ async def root():
         <div class="wrap">
             <div class="section-head">
                 <h2>Try it on real notes</h2>
-                <p>Paste below or load a sample. First brief asks for your work email—then you're set.</p>
+                <p>Paste below or load a sample. First brief asks for your email—then you're set.</p>
             </div>
             <div class="tool-shell">
                 <div class="tool-tabs">
@@ -838,7 +837,7 @@ async def root():
                 </details>
                 <details>
                     <summary>Why do you ask for my email?</summary>
-                    <p>Once, so we know who's using the tool. We require a work email (name@company.com) to prevent spam—no free providers like Gmail.</p>
+                    <p>Once, so we know who's using the tool. We block temporary/disposable emails to prevent spam, but standard emails (Gmail, Outlook, etc.) are totally fine!</p>
                 </details>
                 <details>
                     <summary>What happens to client notes?</summary>
@@ -867,8 +866,8 @@ async def root():
         <div class="gate-card">
             <button class="gate-close" id="gate-close" type="button" aria-label="Close">&times;</button>
             <h2>Almost there</h2>
-            <p>Enter your full work email so we know who’s using the tool (e.g. jordan@youragency.com). No free emails.</p>
-            <input type="text" id="gate-email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="jordan@youragency.com" aria-label="Work email address">
+            <p>Enter your email so we know who's using the tool. Standard emails (Gmail, Outlook, etc.) are great—just no temporary/disposable emails.</p>
+            <input type="text" id="gate-email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="you@yourcompany.com" aria-label="Email address">
             <div class="field-error" id="gate-error"></div>
             <button class="btn-gate" id="gate-submit" type="button">Continue</button>
         </div>
@@ -878,8 +877,8 @@ async def root():
         const EMAIL_KEY = 'briefstudio_email';
         let pendingNotes = null;
         
-        // Frontend blocklist for instant rejection of free emails
-        const BLOCKED_DOMAINS_JS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", "aol.com", "icloud.com", "protonmail.com", "zoho.com", "msn.com", "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com", "yopmail.com", "trashmail.com", "getnada.com", "googlemail.com", "gmx.com"];
+        // Frontend blocklist for instant rejection of disposable/temporary emails ONLY
+        const BLOCKED_DOMAINS_JS = ["mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com", "yopmail.com", "trashmail.com", "getnada.com", "temp-mail.org", "sharklasers.com", "guerrillamailblock.com"];
 
         function getSavedEmail() {
             try { return localStorage.getItem(EMAIL_KEY); } catch (e) { return null; }
@@ -905,7 +904,7 @@ async def root():
             if (labels.some(function (part) { return !part.length; })) return false;
             if (labels[labels.length - 1].length < 2) return false;
             
-            // Block free providers instantly
+            // Block disposable providers instantly
             if (BLOCKED_DOMAINS_JS.includes(domain)) return false;
 
             if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(email)) return false;
@@ -978,7 +977,7 @@ async def root():
                 
                 if (!response.ok) {
                     // If the backend rejects the email, clear it and force the user to re-enter
-                    if (response.status === 400 && data.error && data.error.toLowerCase().includes('work email')) {
+                    if (response.status === 400 && data.error && data.error.toLowerCase().includes('temporary')) {
                         clearSavedEmail();
                         document.getElementById('gate-error').textContent = data.error;
                         document.getElementById('gate-email').classList.add('invalid');
@@ -1025,7 +1024,7 @@ async def root():
             
             if (!isValidEmail(email)) {
                 input.classList.add('invalid');
-                gateError.textContent = 'Please use a valid work email. Free providers (Gmail, Yahoo, etc.) are blocked.';
+                gateError.textContent = 'Please use a valid email. Temporary/disposable emails are blocked.';
                 return;
             }
             
