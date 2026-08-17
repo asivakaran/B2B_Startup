@@ -59,7 +59,7 @@ def call_groq(system_msg: str, user_msg: str, max_tokens: int = 200) -> str:
         "Content-Type": "application/json",
     }
     payload = {
-        "model": "llama-3.3-70b-versatile",
+        "model": "llama3-70b-8192",
         "messages": [
             {"role": "system", "content": system_msg},
             {"role": "user", "content": user_msg},
