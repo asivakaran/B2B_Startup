@@ -8,8 +8,9 @@ from supabase import create_client, Client
 
 load_dotenv()
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+# --- GEMINI AI SETUP ---
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# -----------------------
 
 # --- SUPABASE SETUP ---
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -49,32 +50,26 @@ def validate_work_email(email: str) -> tuple[bool, str]:
     return True, "Valid"
 
 
-def call_groq(system_msg: str, user_msg: str, max_tokens: int = 200) -> str:
-    """
-    Shared helper used by routes so the Groq-calling logic only lives in
-    one place. Raises RuntimeError with a readable message if the request fails.
-    """
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json",
-    }
+def call_ai(system_msg: str, user_msg: str, max_tokens: int = 800) -> str:
+    """Uses Google Gemini 1.5 Flash to call the AI."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    
     payload = {
-        "model": "gemma2-9b-it",
-        "messages": [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg},
-        ],
-        "max_tokens": max_tokens,
+        "system_instruction": {"parts": [{"text": system_msg}]},
+        "contents": [{"parts": [{"text": user_msg}]}],
+        "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.7}
     }
-    response = requests.post(GROQ_URL, headers=headers, json=payload, timeout=30)
+    
+    response = requests.post(url, json=payload, timeout=30)
     if response.status_code != 200:
-        raise RuntimeError(f"Groq API error ({response.status_code}): {response.text}")
+        raise RuntimeError(f"Gemini API error ({response.status_code}): {response.text}")
 
     data = response.json()
     return (
-        data.get("choices", [{}])[0]
-        .get("message", {})
-        .get("content", "")
+        data.get("candidates", [{}])[0]
+        .get("content", {})
+        .get("parts", [{}])[0]
+        .get("text", "")
         .strip()
     )
 
@@ -85,8 +80,8 @@ def generate_brief(
     email: str = Query(..., description="Work email captured by the frontend's email gate"),
 ):
     """Turns messy client notes into a structured, professional client brief."""
-    if not GROQ_API_KEY:
-        return JSONResponse(status_code=500, content={"error": "GROQ_API_KEY not set in environment."})
+    if not GEMINI_API_KEY:
+        return JSONResponse(status_code=500, content={"error": "GEMINI_API_KEY not set in environment."})
 
     # 1. Strict Email Validation
     is_valid, error_msg = validate_work_email(email)
@@ -94,7 +89,7 @@ def generate_brief(
         return JSONResponse(status_code=400, content={"error": error_msg})
 
     try:
-        plan = call_groq(
+        plan = call_ai(
             system_msg=(
                 "Write a professional client project brief from rough intake notes, in the tone "
                 "of an experienced agency account lead. Include: "
