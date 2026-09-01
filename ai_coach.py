@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 2. Grab the Groq API key
-my_api_key = os.getenv("GROQ_API_KEY")
+my_api_key = os.getenv("GEMINI_API_KEY")
 
 if not my_api_key:
-    print("ERROR: Could not find GROQ_API_KEY in your .env file!")
+    print("ERROR: Could not find GEMNI_API_KEY in your .env file!")
     exit()
 
 # 3. Connect to Groq
@@ -23,7 +23,7 @@ print("\nCoach AI is thinking...\n")
 # 5. Send the request to the Llama 3.1 model
 try:
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="gemini-2.5-flash",
         messages=[
             {"role": "system", "content": "You are a strict but encouraging fitness coach."},
             {"role": "user", "content": f"The user has this fitness goal: {user_goal}. Give them a brief, 3-point plan to achieve it."}
