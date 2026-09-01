@@ -51,8 +51,8 @@ def validate_work_email(email: str) -> tuple[bool, str]:
 
 
 def call_ai(system_msg: str, user_msg: str, max_tokens: int = 800) -> str:
-    """Uses Google Gemini 1.5 Flash to call the AI."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    """Uses Google Gemini Flash via the Generative Language API."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     
     payload = {
         "system_instruction": {"parts": [{"text": system_msg}]},
