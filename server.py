@@ -96,7 +96,7 @@ def generate_brief(
                 "Take the rough client notes and write a structured project brief covering: "
                 "Project Overview, Business Goals, Target Audience, Scope of Work, Deliverables, Assumptions & Open Questions, and Suggested Timeline.\n\n"
                 "CRITICAL INSTRUCTION 1: ABSOLUTELY NO HALLUCINATIONS. Do NOT guess, invent, or inject any missing facts, dates, years, or audiences. If information is missing, you MUST write 'Not specified in notes' or make a logical assumption but explicitly FLAG IT as an assumption. Do not invent facts.\n"
-                "CRITICAL INSTRUCTION 2: In the 'Assumptions & Open Questions' section, generate 3 hyper-specific questions that address scope-killers (e.g., budget composition, sign-off authority, missing product details). Do not ask shallow questions like 'what is the launch date?'.\n"
+                "CRITICAL INSTRUCTION 2: In the 'Assumptions & Open Questions' section, generate 3 hyper-specific questions that address scope-killers. You MUST include a question about the number of initial concepts provided and the number of revision rounds included. Do not ask shallow questions like 'what is the launch date?'.\n"
                 "CRITICAL FORMATTING: Use plain text ONLY. NO markdown stars (** or *). Use simple plain-text headings followed by a colon."
             ),
             user_msg=(
