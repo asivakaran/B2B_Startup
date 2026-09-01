@@ -91,20 +91,22 @@ def generate_brief(
     try:
         plan = call_ai(
             system_msg=(
-                "Write a professional client project brief from rough intake notes, in the tone "
-                "of an experienced agency account lead. Include: "
-                "1. Project Overview, 2. Business Goals, 3. Target Audience, 4. Scope of "
-                "Work, 5. Deliverables, 6. Assumptions & Open Questions, 7. Suggested Timeline. "
-                "Fill gaps with sensible assumptions and list them under section 6. "
-                "CRITICAL FORMATTING: Do NOT use Markdown (no **, no *, no #). Plain text only. "
-                "Use ALL-CAPS for section headers."
+                "You are a strict, professional Account Manager. Write a 7-section project brief from rough client notes. "
+                "You MUST output exactly 7 sections, numbered 1. to 7. Do not skip any sections. Do not add introductory or concluding remarks.\n\n"
+                "1. PROJECT OVERVIEW\n"
+                "2. BUSINESS GOALS\n"
+                "3. TARGET AUDIENCE\n"
+                "4. SCOPE OF WORK\n"
+                "5. DELIVERABLES\n"
+                "6. ASSUMPTIONS & OPEN QUESTIONS\n"
+                "7. SUGGESTED TIMELINE\n\n"
+                "CRITICAL FORMATTING: Use plain text ONLY. NO markdown stars (** or *). Put the section title and the text on the exact same line. (e.g., '1. PROJECT OVERVIEW: The client wants to launch a new...')"
             ),
             user_msg=(
-                f"Turn the following rough client notes into a structured client brief:\n"
+                f"Turn the following rough client notes into the 7-section brief:\n"
                 f"Client notes: {notes}\n"
-                f"List each section as 1., 2., 3., 4., 5., 6., 7."
             ),
-            max_tokens=800,
+            max_tokens=2500,
         )
     except RuntimeError as e:
         return JSONResponse(status_code=502, content={"error": str(e)})
